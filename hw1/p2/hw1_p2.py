@@ -31,7 +31,7 @@ def freq_cipher():
     print("{}:{}".format('Y',len([x for x in cipher if x == 'Y'])))
     print("{}:{}".format('Z',len([x for x in cipher if x == 'Z'])))
 
-def split_by(ii=0, step=4):
+def split_by(ii=0, step=3):
     global c
     while ii < len(c):
         print(c[ii:ii+step])

@@ -56,6 +56,9 @@ else:
     for i in range(len(split)):
         subkey1.append(split[i][n])
 
+print(str(subkey1).replace('\'','').replace('[','').replace(']','').replace(',','').replace(' ',''))
+
+
 def print_freq_of_letters(subkey1):
     print("{}:{}".format('A',len([x for x in subkey1 if x == 'A'])))
     print("{}:{}".format('B',len([x for x in subkey1 if x == 'B'])))
