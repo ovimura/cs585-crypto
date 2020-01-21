@@ -14,7 +14,7 @@ bit_key_size = 64
 round_num = 0
 
 ws = {}
-ks = {}
+key = {}
 rs = {}
 
 ftable = {0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3, 0x21,0x15,0x78,0x99,0xb1,0xaf,0xf9,
@@ -60,7 +60,7 @@ def read_plaintext(file, size):
     return s
 
 def read_key(file):
-    global ks
+    global key
     with open(file) as f:
         data = f.read()
     s = "".join("0x{:02x} ".format(ord(c)) for c in data)
@@ -69,25 +69,25 @@ def read_key(file):
     idx = 0
     temp = []
     for i in range(0,len(d), 2):
-        ks[idx] = []
+        key[idx] = []
         x = len(d)%2 if(len(d)<i+x) else 2
         for j in range(i, i+x):
             temp.append(d[j])
-        ks[idx] += (temp)
+        key[idx] += (temp)
         idx += 1
         temp.clear()
     print('key')
-    print(ks)
+    print(key)
     return s
 
 def encrypt():
     global round_num
     global ws
-    global ks
+    global key
     temp = []
     for i in range(4):
         w = ws[i]
-        k = ks[i]
+        k = key[i]
         rs[i] = []
         for j in range(2):
             temp.append(w[j] ^ k[j])
@@ -95,15 +95,20 @@ def encrypt():
         temp.clear()
     print('rounds')
     print(rs)
-    F(1,1,1)
+    T0 = G(rs[0], round_num)
+    T1 = G(rs[1], round_num)
 
-def F(r1, r2, r):
+def F(R1, R2, round):
+    global rs
+    F0, F1 = 0
+    R0
+    return F0, F1
+
+def G(r, round):
     pass
 
-def G():
-    pass
-
-def K():
+def K(x):
+    global key
     pass
 
 
