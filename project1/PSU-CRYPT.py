@@ -11,19 +11,61 @@ key_file = None
 bit_bock_size = 64
 bit_key_size = 64
 
+round_num = 0
+
+ws = {}
+ks = {}
 
 def print_input_file_names():
     print("plaintext file name: {}".format(plaintext_file))
     print("key file name: {}".format(key_file))
 
-def read_bytes(file, size):
+def read_plaintext(file, size):
+    global ws
     with open(file) as f:
         data = f.read()
     s = "".join("0x{:02x} ".format(ord(c)) for c in data)
-    d = data.encode()
-    #print(s.encode()[1])
-    print(d[1] ^ 0xFF)
+    d = data.encode()[:-1]
+    x = 8
+    idx = 0
+    temp = []
+    for i in range(0,len(d), 8):
+        ws[idx] = []
+        x = len(d)%8 if(len(d)<i+x) else 8
+        for j in range(i, i+x):
+            temp.append(d[j])
+        ws[idx] += (temp)
+        idx += 1
+        temp.clear()
+    print(ws)
     return s
+
+def read_key(file):
+    global ks
+    with open(file) as f:
+        data = f.read()
+    s = "".join("0x{:02x} ".format(ord(c)) for c in data)
+    d = data.encode()[:-1]
+    x = 8
+    idx = 0
+    temp = []
+    for i in range(0,len(d), 8):
+        ks[idx] = []
+        x = len(d)%8 if(len(d)<i+x) else 8
+        for j in range(i, i+x):
+            temp.append(d[j])
+        ks[idx] += (temp)
+        idx += 1
+        temp.clear()
+    print(ks)
+    return s
+
+
+def encrypt():
+    global round_num
+    global ws
+    global ks
+
 
 
 
@@ -42,8 +84,8 @@ def main():
         key_file = sys.argv[2]
 #        print_input_file_names()
 
-    read_bytes(plaintext_file, 10)
-
+    read_plaintext(plaintext_file, 10)
+    read_key(key_file)
 
 
 
