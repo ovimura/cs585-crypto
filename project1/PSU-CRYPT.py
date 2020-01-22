@@ -17,6 +17,7 @@ round_num = 0
 ws = {}
 key = {}
 rs = {}
+keys = []
 
 ddd = None
 
@@ -85,9 +86,9 @@ def read_key(file):
     print("".join("0x{:02x} ".format(ord(x)) for x in data))
     return data
 
-def read_hex_to_hex():
+def read_hex_to_key(file='key.txt'):
     global key
-    with open('key.txt') as f:
+    with open(file) as f:
             data = f.read()
     d = data[:-1]
     li = []
@@ -105,11 +106,10 @@ def read_hex_to_hex():
         idx += 1
         temp.clear()
 
-    print(key)
-    return key
+    print(d)
+    return d
 
-print(read_hex_to_hex())
-exit(3)
+print(read_hex_to_key())
 
 def encrypt():
     global round_num
@@ -138,22 +138,23 @@ def F(R1, R2, round):
 def G(r, round):
     pass
 
+
+# https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
 def K(x):
     global key
     print(key)
-    #a = ''.join(format(ord(xx), 'b') for xx in x)
-    print(''.join(format(ord(xx), 'b') for xx in x))
     n = ''.join(format(ord(xx), 'x') for xx in x)
     print('n')
     print(n)
-    z = int(n, 16)
+    z = int('0x'+'5',16)
     print(z)
-    print(''.join(format(ord(xx), 'x') for xx in x))
     r = leftRotate(z,1)
-    print("{:b}".format(z))
+    # print(bin(r)[-3:]) # the same thing like the following statement
+    print("{:b}".format(int(bin(r)[-3:],2)))
+    print(r)
     print(''.join(format(z, 'b')))
 
-INT_BITS = 64
+INT_BITS = 3
 
 # Function to left
 # rotate n by d bits
@@ -166,6 +167,9 @@ def leftRotate(n, d):
 
 print('numm')
 print(leftRotate(3132393435363733,3))
+print(leftRotate(int('3132393435363733',10),3))
+
+print('-----')
 
 gg = leftRotate(3132393435363733,1)
 print(gg)
@@ -187,8 +191,9 @@ def main():
 #        print_input_file_names()
 
     #read_plaintext(plaintext_file, 10)
-    str_key = read_key(key_file)
+    str_key = read_hex_to_key(key_file)
     ddd = str_key
+    print('ddd')
     print(ddd)
     #encrypt()
     K(str_key)
