@@ -49,7 +49,14 @@ def leftRotate(n, d):
     # with n >>(INT_BITS - d)
     return (n << d)|(n >> (INT_BITS - d))
 
-
+# Function to right
+# rotate n by d bits
+def rightRotate(n, d):
+    # In n>>d, first d bits are 0.
+    # To put last 3 bits of at
+    # first, do bitwise or of n>>d
+    # with n <<(INT_BITS - d)
+    return (n >> d)|(n << (INT_BITS - d)) & 0xFFFFFFFF
 
 def print_input_file_names():
     print("plaintext file name: {}".format(plaintext_file))
@@ -149,7 +156,6 @@ def F(R1, R2, round):
 def G(r, round):
     pass
 
-
 # https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
 def K(x):
     global key
@@ -177,7 +183,33 @@ def K(x):
     print("after rotation 1 (in hex): {}".format(hex(result)))
     #print("{:b}".format(int(bin(result),2)))
     #print('{0:x}'.format(int(bin(result),2)))
+    kk = '{0:x}'.format(int(bin(result),2))
+    keys.append(kk)
     print('-------------------------')
+    print(keys)
+    print('+++++++++++++++++++++++++')
+    for i in range(1,16):
+        print('----- key rotation {} -----'.format(i))
+        print("64 bit key (in hex): {}".format(keys[i-1]))
+
+        s1 = "{:b}".format(int(keys[i-1],16))
+        # fill 64 bits
+        if(len(s1)<64):
+            n = len(s1)
+            for _ in range(n,64):
+                s1 = '0'+s1
+        print("initial key (64 bit):         {}".format(s1))
+
+        result = leftRotate(int(keys[i-1],16),1)
+
+        s = "{:b}".format(int(bin(result),2))
+        print("after rotation 2 (in binary): {}".format(s[-64:]))
+        print("after rotation 2 (in hex): {}".format(hex(result)))
+        kk = '{0:x}'.format(int(bin(result),2))
+        keys.append(kk)
+        print('-------------------------')
+        print(keys)
+        print('+++++++++++++++++++++++++')
 
 
 def main():
