@@ -18,7 +18,7 @@ ws = {}
 key = {}
 rs = {}
 keys = []
-key_str = None
+
 ddd = None
 
 ftable = [[0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3, 0x21,0x15,0x78,0x99,0xb1,0xaf,0xf9],
@@ -37,18 +37,6 @@ ftable = [[0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3, 0x21,0x15,0x78,0x99,0xb
 [0x0c,0xef,0xbc,0x72,0x75,0x6f,0x37,0xa1,0xec,0xd3,0x8e,0x62,0x8b,0x86,0x10,0xe8],
 [0x08,0x77,0x11,0xbe,0x92,0x4f,0x24,0xc5,0x32,0x36,0x9d,0xcf,0xf3,0xa6,0xbb,0xac],
 [0x5e,0x6c,0xa9,0x13,0x57,0x25,0xb5,0xe3,0xbd,0xa8,0x3a,0x01,0x05,0x59,0x2a,0x46]]
-
-INT_BITS = 64
-
-# Function to left
-# rotate n by d bits
-def leftRotate(n, d):
-    # In n<<d, last d bits are 0.
-    # To put first 3 bits of n at
-    # last, do bitwise or of n<<d
-    # with n >>(INT_BITS - d)
-    return (n << d)|(n >> (INT_BITS - d))
-
 
 
 def print_input_file_names():
@@ -100,13 +88,12 @@ def read_key(file):
 
 def read_hex_to_key(file='key.txt'):
     global key
-    global key_str
     with open(file) as f:
             data = f.read()
-    key_str = data[:-1]
+    d = data[:-1]
     li = []
-    for i in range(0,len(key_str),2):
-        li.append(key_str[i:i+2])
+    for i in range(0,len(d),2):
+        li.append(d[i:i+2])
     x = 8
     idx = 0
     temp = []
@@ -118,7 +105,9 @@ def read_hex_to_key(file='key.txt'):
         key[idx] += (temp)
         idx += 1
         temp.clear()
-    return key_str
+
+    print(d)
+    return d
 
 print(read_hex_to_key())
 
@@ -153,31 +142,38 @@ def G(r, round):
 # https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
 def K(x):
     global key
-    global key_str
     print(key)
-    print('----- key rotation 1 -----')
-    #print(hex(leftRotate(int(0x4142414241424142),1)))
-    #print("{:b}".format(int(0x4142414241424142)))
-    #res = leftRotate(int('4142414241424142',16),1)
-    print("64 bit key (in hex): {}".format(int(key_str)))
-    #print("{:b}".format(int(key_str,16)))
+    n = ''.join(format(ord(xx), 'x') for xx in x)
+    print('n')
+    print(n)
+    z = int('0x'+'5',16)
+    print(z)
+    r = leftRotate(z,1)
+    # print(bin(r)[-3:]) # the same thing like the following statement
+    print("{:b}".format(int(bin(r)[-3:],2)))
+    print(r)
+    print(''.join(format(z, 'b')))
 
-    s1 = "{:b}".format(int(key_str,16))
-    # fill 64 bits
-    if(len(s1)<64):
-        n = len(s1)
-        for _ in range(n,64):
-            s1 = '0'+s1
-    print("initial key (64 bit):         {}".format(s1))
+INT_BITS = 3
 
-    result = leftRotate(int(key_str,16),1)
+# Function to left
+# rotate n by d bits
+def leftRotate(n, d):
+    # In n<<d, last d bits are 0.
+    # To put first 3 bits of n at
+    # last, do bitwise or of n<<d
+    # with n >>(INT_BITS - d)
+    return (n << d)|(n >> (INT_BITS - d))
 
-    s = "{:b}".format(int(bin(result),2))
-    print("after rotation 1 (in binary): {}".format(s[-64:]))
-    print("after rotation 1 (in hex): {}".format(hex(result)))
-    #print("{:b}".format(int(bin(result),2)))
-    #print('{0:x}'.format(int(bin(result),2)))
-    print('-------------------------')
+print('numm')
+print(leftRotate(3132393435363733,3))
+print(leftRotate(int('3132393435363733',10),3))
+
+print('-----')
+
+gg = leftRotate(3132393435363733,1)
+print(gg)
+print(''.join(format(gg, 'x'))) # for y in gg))
 
 
 def main():
@@ -195,10 +191,12 @@ def main():
 #        print_input_file_names()
 
     #read_plaintext(plaintext_file, 10)
-    read_hex_to_key(key_file)
-
+    str_key = read_hex_to_key(key_file)
+    ddd = str_key
+    print('ddd')
+    print(ddd)
     #encrypt()
-    K(1)
+    K(str_key)
 
 
 
