@@ -154,7 +154,7 @@ def K(x):
     print(r)
     print(''.join(format(z, 'b')))
 
-INT_BITS = 3
+INT_BITS = 64
 
 # Function to left
 # rotate n by d bits
@@ -166,8 +166,13 @@ def leftRotate(n, d):
     return (n << d)|(n >> (INT_BITS - d))
 
 print('numm')
-print(leftRotate(3132393435363733,3))
-print(leftRotate(int('3132393435363733',10),3))
+print(leftRotate(int(0x4142414241424142),3))
+print("{:b}".format(int(0x4142414241424142)))
+res = leftRotate(int('4142414241424142',16),3)
+print(res)
+s = "{:b}".format(int(bin(res),2))
+print(s[-(len(s)-2):])
+print("{:b}".format(int(bin(res),2)))
 
 print('-----')
 
