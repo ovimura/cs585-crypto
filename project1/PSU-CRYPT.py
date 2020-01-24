@@ -182,7 +182,7 @@ def K(x):
     print(keys)
     print('+++++++++++++++++++++++++')
     j = 1
-    for i in range(1,16):
+    for i in range(1,64):
         j = 1
         print('----- key rotation {} -----'.format(i+j))
         print("64 bit key (in hex): {}".format(keys[i-1]))
