@@ -175,8 +175,8 @@ def K(x):
 
     s = "{:b}".format(int(bin(result),2))
     print("after rotation 1 (in binary): {}".format(s[-64:]))
-    print("after rotation 1 (in hex): {}".format(hex(result)))
-    kk = '{0:x}'.format(int(bin(result),2))
+    print("after rotation 1 (in hex): {}".format(hex(int(s[-64:],2))))
+    kk = '{0:x}'.format(int(bin(result)[-64:],2))
     keys.append(kk)
     print('-------------------------')
     print(keys)
