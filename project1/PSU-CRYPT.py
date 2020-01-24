@@ -11,7 +11,6 @@ key_file = None
 
 bit_bock_size = 64
 bit_key_size = 64
-
 round_num = 0
 
 ws = {}
@@ -105,6 +104,7 @@ def read_key(file):
     print("".join("0x{:02x} ".format(ord(x)) for x in data))
     return data
 
+# https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx
 def read_hex_to_key(file='key.txt'):
     global key
     global key_str
@@ -160,14 +160,9 @@ def G(r, round):
 def K(x):
     global key
     global key_str
-    print(key)
     print('----- key rotation 1 -----')
-    #print(hex(leftRotate(int(0x4142414241424142),1)))
-    #print("{:b}".format(int(0x4142414241424142)))
-    #res = leftRotate(int('4142414241424142',16),1)
-    print("64 bit key (in hex): {}".format(int(key_str)))
-    #print("{:b}".format(int(key_str,16)))
-
+    print("64 bit key (in hex): {0:x}".format(int(key_str,16)))
+    # print("{:b}".format(int(key_str,16)))
     s1 = "{:b}".format(int(key_str,16))
     # fill 64 bits
     if(len(s1)<64):
@@ -181,17 +176,16 @@ def K(x):
     s = "{:b}".format(int(bin(result),2))
     print("after rotation 1 (in binary): {}".format(s[-64:]))
     print("after rotation 1 (in hex): {}".format(hex(result)))
-    #print("{:b}".format(int(bin(result),2)))
-    #print('{0:x}'.format(int(bin(result),2)))
     kk = '{0:x}'.format(int(bin(result),2))
     keys.append(kk)
     print('-------------------------')
     print(keys)
     print('+++++++++++++++++++++++++')
+    j = 1
     for i in range(1,16):
-        print('----- key rotation {} -----'.format(i))
+        j = 1
+        print('----- key rotation {} -----'.format(i+j))
         print("64 bit key (in hex): {}".format(keys[i-1]))
-
         s1 = "{:b}".format(int(keys[i-1],16))
         # fill 64 bits
         if(len(s1)<64):
@@ -199,17 +193,32 @@ def K(x):
             for _ in range(n,64):
                 s1 = '0'+s1
         print("initial key (64 bit):         {}".format(s1))
-
         result = leftRotate(int(keys[i-1],16),1)
-
-        s = "{:b}".format(int(bin(result),2))
-        print("after rotation 2 (in binary): {}".format(s[-64:]))
-        print("after rotation 2 (in hex): {}".format(hex(result)))
-        kk = '{0:x}'.format(int(bin(result),2))
+        #ss = bin(result)[-64:]
+        ss = '{0:b}'.format(result)
+        ss = ss[-64:]
+        print(len(ss))
+        s2 = ss
+        if(len(ss)<64):
+            n = len(ss)
+            for _ in range(n,64):
+                s2 = '0'+s2
+        else:
+            s2 = ss
+        ss = s2
+        # print('ss: {}'.format(ss))
+        #s = "{:b}".format(int(ss,2))
+        s = "{:b}".format(int(ss,2))
+        print("after rotation {} (in binary): {}".format(i+j, ss))
+        print("after rotation {} (in hex): {}".format(i+j, hex(int(ss,2))))
+        kk = '{0:x}'.format(int(ss,2))
+        print(kk)
         keys.append(kk)
         print('-------------------------')
-        print(keys)
-        print('+++++++++++++++++++++++++')
+    for k in keys:
+        print(k)
+#    print(keys)
+        #print('+++++++++++++++++++++++++')
 
 
 def main():
