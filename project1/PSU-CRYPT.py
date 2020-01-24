@@ -141,66 +141,105 @@ def encrypt():
         k = key[i]
         rs[i] = []
         for j in range(2):
-            temp.append(w[j] ^ k[j])
+            temp.append(w[j] ^ int(k[j],16))
         rs[i] += temp
         temp.clear()
     print('rounds')
+    round_num = 0
     print(rs)
+    print('F')
+    R0 = rs[0]
+    R1 = rs[1]
+    R2 = rs[2]
+    R3 = rs[3]
+    for _ in range(16):
+        F0, F1 = F(R0, R1, round_num)
+        print(hex(F0))
+        print(hex(F1))
+        print(R0)
+        print(R1)
+        print('================')
+        R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0
+        R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1
+        R2 = [int('{:x}'.format(int('{:x}'.format(R0)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R0)[2:4],16)),16)]
+        R3 = [int('{:x}'.format(int('{:x}'.format(R1)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R1)[2:4],16)),16)]
+        print(R2)
+        print(R3)
+        #R2 = R0
+        #R3 = R1
+        print('***************')
+        round_num += 1
+        print(_)
+
+def F(R0, R1, round):
+    global rs
+    F0 = 0
+    F1 = 0
+    print(R0)
+    print(R1)
+    print(rs[0])
     T0 = G(rs[0], round_num)
     T1 = G(rs[1], round_num)
-
-def F(R1, R2, round):
-    global rs
-    F0, F1 = 0
-    #R0
+    F0 = (int(T0,16) + 2*int(T1,16) +  int(K(4*round_num)+K(4*round_num+1), 16)) % 2**16
+    F1 = (2*int(T0,16)+int(T1,16) + int(K(4*round_num+2)+K(4*round_num+3), 16)) % 2**16
     return F0, F1
 
-def G(r, round):
-    pass
+def G(w, round):
+    g1 = w[0]
+    g2 = w[1]
 
-# https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
-def K(x):
+    # g3
+    idx = hex(g2 ^ int(K(4*round_num),16))
+    #print(idx)
+    x = int(idx[-2:-1],16) if len(idx) == 4 else 0
+    y = int(idx[-1:],16)
+    g3 = ftable[x][y] ^ g1
+
+    # g4
+    idx = hex(g3 ^ int(K(4*round_num+1),16))
+    x = int(idx[-2:-1],16) if len(idx) == 4 else 0
+    y = int(idx[-1:],16)
+    g4 = ftable[x][y] ^ g2
+
+    # g5
+    idx = hex(g4 ^ int(K(4*round_num+2),16))
+    x = int(idx[-2:-1],16) if len(idx) == 4 else 0
+    y = int(idx[-1:],16)
+    g5 = ftable[x][y] ^ g3
+
+    # g6
+    idx = hex(g5 ^ int(K(4*round_num+3),16))
+    print(idx)
+    x = int(idx[-2:-1],16) if len(idx) == 4 else 0
+    y = int(idx[-1:],16)
+    g6 = ftable[x][y] ^ g4
+
+    return '{:x}{:x}'.format(g5,g6)
+
+def generate_subkeys():
     global new_key
     global key
     global key_str
-#    print('----- key rotation 1 -----')
-#    print("64 bit key (in hex): {0:x}".format(int(key_str,16)))
-    # print("{:b}".format(int(key_str,16)))
     s1 = "{:b}".format(int(key_str,16))
-    # fill 64 bits
     if(len(s1)<64):
         n = len(s1)
         for _ in range(n,64):
             s1 = '0'+s1
-#    print("initial key (64 bit):         {}".format(s1))
-
     result = leftRotate(int(key_str,16),1)
-
     s = "{:b}".format(int(bin(result),2))
-#    print("after rotation 1 (in binary): {}".format(s[-64:]))
-#    print("after rotation 1 (in hex): {}".format(hex(int(s[-64:],2))))
     kk = '{0:x}'.format(int(bin(result)[-64:],2))
     keys.append(kk)
-#    print('-------------------------')
-#    print(keys)
-#    print('+++++++++++++++++++++++++')
     j = 1
-    for i in range(1,64):
+    for i in range(1,192):
         j = 1
-#        print('----- key rotation {} -----'.format(i+j))
-#        print("64 bit key (in hex): {}".format(keys[i-1]))
         s1 = "{:b}".format(int(keys[i-1],16))
-        # fill 64 bits
         if(len(s1)<64):
             n = len(s1)
             for _ in range(n,64):
                 s1 = '0'+s1
-#        print("initial key (64 bit):         {}".format(s1))
         result = leftRotate(int(keys[i-1],16),1)
-        #ss = bin(result)[-64:]
         ss = '{0:b}'.format(result)
         ss = ss[-64:]
-#        print(len(ss))
         s2 = ss
         if(len(ss)<64):
             n = len(ss)
@@ -209,13 +248,8 @@ def K(x):
         else:
             s2 = ss
         ss = s2
-        # print('ss: {}'.format(ss))
-        #s = "{:b}".format(int(ss,2))
         s = "{:b}".format(int(ss,2))
-#        print("after rotation {} (in binary): {}".format(i+j, ss))
-#        print("after rotation {} (in hex): {}".format(i+j, hex(int(ss,2))))
         kk = '{0:x}'.format(int(ss,2))
- #       print(kk)
         s3 = kk
         if(len(s3)<16):
             n = len(s3)
@@ -223,25 +257,27 @@ def K(x):
                 s3 = '0'+s3
         else:
             s3 = s3
-#        print(s3)
-
         keys.append(s3)
-#        print('-------------------------')
-#    for k in keys:
-#        print(k)
-    z = x % 8
-#    print("=========================")
-    print(z)
-    a = z*2
-    str = keys[new_key]
-    print(keys[new_key])
-    new_key += 1
+        # for k in range(len(keys)):
+        #     print(keys[k])
+        # print(k)
 
-    if(x == 0):
-        print(str[-(a+2):])
+
+# https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
+def K(x):
+    global new_key
+    global key_str
+    z = x % 8
+    a = z*2
+    print('new key: {}'.format(new_key))
+    str = keys[new_key]
+    #print(keys[new_key])
+    new_key += 1
+    if(int(z) == 0):
+    #    print(str[-(a+2):])
         return str[-(a+2):]
     else:
-        print(str[-(a+2):-a])
+   #     print(str[-(a+2):-a])
         return str[-(a+2):-a]
 
 
@@ -258,19 +294,19 @@ def main():
         plaintext_file = sys.argv[1]
         key_file = sys.argv[2]
 #        print_input_file_names()
-
-    #read_plaintext(plaintext_file, 10)
+    generate_subkeys()
+    read_plaintext(plaintext_file, 10)
     read_hex_to_key(key_file)
 
-    #encrypt()
-    K(0)
-    K(1)
-    K(2)
-    K(3)
-    K(4)
-    K(5)
-    K(6)
-    K(7)
+    encrypt()
+    # K(0)
+    # K(1)
+    # K(2)
+    # K(3)
+    # K(4)
+    # K(5)
+    # K(6)
+    # K(7)
 
 
 
