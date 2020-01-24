@@ -19,6 +19,8 @@ rs = {}
 keys = []
 key_str = None
 ddd = None
+new_key = 0
+
 
 ftable = [[0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3, 0x21,0x15,0x78,0x99,0xb1,0xaf,0xf9],
 [0xe7,0x2d,0x4d,0x8a,0xce,0x4c,0xca,0x2e,0x52,0x95,0xd9,0x1e,0x4e,0x38,0x44,0x28],
@@ -158,10 +160,11 @@ def G(r, round):
 
 # https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
 def K(x):
+    global new_key
     global key
     global key_str
-    print('----- key rotation 1 -----')
-    print("64 bit key (in hex): {0:x}".format(int(key_str,16)))
+#    print('----- key rotation 1 -----')
+#    print("64 bit key (in hex): {0:x}".format(int(key_str,16)))
     # print("{:b}".format(int(key_str,16)))
     s1 = "{:b}".format(int(key_str,16))
     # fill 64 bits
@@ -169,35 +172,35 @@ def K(x):
         n = len(s1)
         for _ in range(n,64):
             s1 = '0'+s1
-    print("initial key (64 bit):         {}".format(s1))
+#    print("initial key (64 bit):         {}".format(s1))
 
     result = leftRotate(int(key_str,16),1)
 
     s = "{:b}".format(int(bin(result),2))
-    print("after rotation 1 (in binary): {}".format(s[-64:]))
-    print("after rotation 1 (in hex): {}".format(hex(int(s[-64:],2))))
+#    print("after rotation 1 (in binary): {}".format(s[-64:]))
+#    print("after rotation 1 (in hex): {}".format(hex(int(s[-64:],2))))
     kk = '{0:x}'.format(int(bin(result)[-64:],2))
     keys.append(kk)
-    print('-------------------------')
-    print(keys)
-    print('+++++++++++++++++++++++++')
+#    print('-------------------------')
+#    print(keys)
+#    print('+++++++++++++++++++++++++')
     j = 1
     for i in range(1,64):
         j = 1
-        print('----- key rotation {} -----'.format(i+j))
-        print("64 bit key (in hex): {}".format(keys[i-1]))
+#        print('----- key rotation {} -----'.format(i+j))
+#        print("64 bit key (in hex): {}".format(keys[i-1]))
         s1 = "{:b}".format(int(keys[i-1],16))
         # fill 64 bits
         if(len(s1)<64):
             n = len(s1)
             for _ in range(n,64):
                 s1 = '0'+s1
-        print("initial key (64 bit):         {}".format(s1))
+#        print("initial key (64 bit):         {}".format(s1))
         result = leftRotate(int(keys[i-1],16),1)
         #ss = bin(result)[-64:]
         ss = '{0:b}'.format(result)
         ss = ss[-64:]
-        print(len(ss))
+#        print(len(ss))
         s2 = ss
         if(len(ss)<64):
             n = len(ss)
@@ -209,16 +212,37 @@ def K(x):
         # print('ss: {}'.format(ss))
         #s = "{:b}".format(int(ss,2))
         s = "{:b}".format(int(ss,2))
-        print("after rotation {} (in binary): {}".format(i+j, ss))
-        print("after rotation {} (in hex): {}".format(i+j, hex(int(ss,2))))
+#        print("after rotation {} (in binary): {}".format(i+j, ss))
+#        print("after rotation {} (in hex): {}".format(i+j, hex(int(ss,2))))
         kk = '{0:x}'.format(int(ss,2))
-        print(kk)
-        keys.append(kk)
-        print('-------------------------')
-    for k in keys:
-        print(k)
-#    print(keys)
-        #print('+++++++++++++++++++++++++')
+ #       print(kk)
+        s3 = kk
+        if(len(s3)<16):
+            n = len(s3)
+            for _ in range(n,16):
+                s3 = '0'+s3
+        else:
+            s3 = s3
+#        print(s3)
+
+        keys.append(s3)
+#        print('-------------------------')
+#    for k in keys:
+#        print(k)
+    z = x % 8
+#    print("=========================")
+    print(z)
+    a = z*2
+    str = keys[new_key]
+    print(keys[new_key])
+    new_key += 1
+
+    if(x == 0):
+        print(str[-(a+2):])
+        return str[-(a+2):]
+    else:
+        print(str[-(a+2):-a])
+        return str[-(a+2):-a]
 
 
 def main():
@@ -239,7 +263,14 @@ def main():
     read_hex_to_key(key_file)
 
     #encrypt()
+    K(0)
     K(1)
+    K(2)
+    K(3)
+    K(4)
+    K(5)
+    K(6)
+    K(7)
 
 
 
