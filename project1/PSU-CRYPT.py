@@ -149,6 +149,11 @@ def encrypt_0():
     R1 = rs[1]
     R2 = rs[2]
     R3 = rs[3]
+    rr0 = None
+    rr1 = None
+    rr2 = None
+    rr3 = None
+
     for _ in range(16):
         print('round {}'.format(_))
         print(R0)
@@ -190,6 +195,13 @@ def encrypt_0():
         y3 = PREV_R1
         R2 = PREV_R0
         R3 = PREV_R1
+        rr0 = y2
+        rr1 = y3
+        rr2 = y0
+        rr3 = y1
+
+        R2 = PREV_R0
+        R3 = PREV_R1
         print(y2)
         print(y3)
         print(hex(y0[0]))
@@ -205,6 +217,42 @@ def encrypt_0():
         print('cipher')
         print(cipher)
         print("#########################")
+    print(rr0,rr1,rr2,rr3)
+    yy0 = rr0
+    yy1 = rr1
+    yy2 = rr2
+    yy3 = rr3
+    cipher = '{:02x}{:02x}'.format(yy0[0],yy0[1]) + '{:02x}{:02x}'.format(yy1[0],yy1[1]) + '{:02x}{:02x}'.format(yy2[0],yy2[1]) + '{:x}{:x}'.format(yy3[0],yy3[1])
+    #for z in range(len(cipher)):
+    print(cipher)
+    print(key)
+    temp = []
+    c = {}
+    m = 4
+    idx = 0
+    for i in range(0,16,4):
+        w = cipher[i:(i+4)]
+        k = key[(i-m)%4]
+        m-=1
+        c[idx] = []
+        print(w)
+        print(k)
+        id = 0
+        for j in range(0,4,2):
+            print(w[j:(j+2)])
+            temp.append(int(w[j:(j+2)],16) ^ int(k[id],16))
+            id+=1
+        c[idx] += temp
+        idx+=1
+        temp.clear()
+    print(c)
+    cc = ''
+    for n in range(4):
+        cc += '{:02x}'.format(c[n][0])
+        cc += '{:02x}'.format(c[n][1])
+    print(cc)
+    print('b3db233bb437c713')
+    print(cipher)
     return cipher
 
 
