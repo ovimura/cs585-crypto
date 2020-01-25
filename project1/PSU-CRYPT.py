@@ -170,6 +170,18 @@ def encrypt():
         print('***************')
         round_num += 1
         print(_)
+    y0 = R2
+    y1 = R3
+    y2 = R0
+    y3 = R1
+    print(hex(int('{:02x}{:02x}'.format(R2[0],R2[1]),16)))
+    print(hex(int('{:02x}{:02x}'.format(R3[0],R3[1]),16)))
+    print(hex(int('{:02x}{:02x}'.format(y0[0],y0[1]),16)))
+    print(hex(int('{:02x}{:02x}'.format(y1[0],y1[1]),16)))
+    cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:04x}'.format(y2) + '{:04x}'.format(y3)
+    print(cipher)
+    return cipher
+
 
 def F(R0, R1, round):
     global rs
