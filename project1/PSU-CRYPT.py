@@ -63,7 +63,7 @@ def print_input_file_names():
     print("plaintext file name: {}".format(plaintext_file))
     print("key file name: {}".format(key_file))
 
-def read_plaintext(file, size):
+def read_plaintext(file):
     global ws
     with open(file) as f:
         data = f.read()
@@ -80,8 +80,8 @@ def read_plaintext(file, size):
         ws[idx] += (temp)
         idx += 1
         temp.clear()
-    print('words')
-    print(ws)
+    # print('words')
+    # print(ws)
     return s
 
 def read_key(file):
@@ -129,7 +129,67 @@ def read_hex_to_key(file='key.txt'):
         temp.clear()
     return key_str
 
-print(read_hex_to_key())
+read_hex_to_key()
+
+def encrypt_0():
+    global round_num
+    global ws
+    global key
+    temp = []
+    for i in range(4):
+        w = ws[i]
+        k = key[i]
+        rs[i] = []
+        for j in range(2):
+            temp.append(w[j] ^ int(k[j],16))
+        rs[i] += temp
+        temp.clear()
+    round_num = 0
+    #print('{:02x} {:02x} '.format(rs[0][0],rs[0][1]) + '{:02x} {:02x} '.format(rs[1][0],rs[1][1]) +
+#          '{:02x} {:02x} '.format(rs[2][0],rs[2][1]) + '{:02x} {:02x} '.format(rs[3][0],rs[3][1]))
+    #print('F')
+    R0 = rs[0]
+    R1 = rs[1]
+    R2 = rs[2]
+    R3 = rs[3]
+    for _ in range(1):
+        F0, F1 = F(R0, R1, round_num)
+        print('================')
+        PREV_R0 = R0
+        PREV_R1 = R1
+        print('---------')
+        print('{:02x}{:02x}'.format(R2[0],R2[1]))
+        print('{:02x}{:02x}'.format(R3[0],R3[1]))
+        R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0
+        R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1
+        print('{:04x}'.format(R0))
+        print('{:04x}'.format(R1))
+        whitening = '{:04x}'.format(R0) + '{:04x}'.format(R1) + '{:02x}{:02x}'.format(R2[0],R2[1]) + '{:02x}{:02x}'.format(R3[0],R3[1])
+        print(whitening)
+        R2 = [int('{:x}'.format(int('{:x}'.format(R0)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R0)[2:4],16)),16)]
+        R3 = [int('{:x}'.format(int('{:x}'.format(R1)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R1)[2:4],16)),16)]
+
+        print(R2)
+        print(R3)
+        #R2 = R0
+        #R3 = R1
+#        print('***************')
+        round_num += 1
+#        print(_)
+    y0 = R2
+    y1 = R3
+    y2 = PREV_R0
+    y3 = PREV_R1
+    # print(hex(int('{:02x}{:02x}'.format(R2[0],R2[1]),16)))
+    # print(hex(int('{:02x}{:02x}'.format(R3[0],R3[1]),16)))
+    # print(hex(int('{:02x}{:02x}'.format(y0[0],y0[1]),16)))
+    # print(hex(int('{:02x}{:02x}'.format(y1[0],y1[1]),16)))
+    cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:02x}{:02x}'.format(y2[0],y2[1]) + '{:02x}{:02x}'.format(y3[0],y3[1])
+    # cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:04x}'.format(y2) + '{:04x}'.format(y3)
+    print('cipher')
+    print(cipher)
+    return cipher
+
 
 def encrypt():
     global round_num
@@ -152,7 +212,7 @@ def encrypt():
     R1 = rs[1]
     R2 = rs[2]
     R3 = rs[3]
-    for _ in range(16):
+    for _ in range(1):
         F0, F1 = F(R0, R1, round_num)
         print(hex(F0))
         print(hex(F1))
@@ -183,17 +243,26 @@ def encrypt():
     return cipher
 
 
+
+
+
+
 def F(R0, R1, round):
     global rs
     F0 = 0
     F1 = 0
-    print(R0)
-    print(R1)
-    print(rs[0])
-    T0 = G(rs[0], round_num)
-    T1 = G(rs[1], round_num)
-    F0 = (int(T0,16) + 2*int(T1,16) +  int(K(4*round_num)+K(4*round_num+1), 16)) % 2**16
-    F1 = (2*int(T0,16)+int(T1,16) + int(K(4*round_num+2)+K(4*round_num+3), 16)) % 2**16
+    # print(R0)
+    # print(R1)
+    # print(rs[0])
+    T0 = G(rs[0], round)
+    T1 = G(rs[1], round)
+    F0 = (int(T0,16) + 2*int(T1,16) +  int(K(4*round)+K(4*round+1), 16)) % 2**16
+    F1 = (2*int(T0,16)+int(T1,16) + int(K(4*round+2)+K(4*round+3), 16)) % 2**16
+
+    print(T0,T1)
+    # print(T1)
+    print(hex(F0),hex(F1))
+    # print(hex(F1))
     return F0, F1
 
 def G(w, round):
@@ -201,31 +270,31 @@ def G(w, round):
     g2 = w[1]
 
     # g3
-    idx = hex(g2 ^ int(K(4*round_num),16))
+    idx = hex(g2 ^ int(K(4*round),16))
     #print(idx)
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
     g3 = ftable[x][y] ^ g1
 
     # g4
-    idx = hex(g3 ^ int(K(4*round_num+1),16))
+    idx = hex(g3 ^ int(K(4*round+1),16))
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
     g4 = ftable[x][y] ^ g2
 
     # g5
-    idx = hex(g4 ^ int(K(4*round_num+2),16))
+    idx = hex(g4 ^ int(K(4*round+2),16))
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
     g5 = ftable[x][y] ^ g3
 
     # g6
-    idx = hex(g5 ^ int(K(4*round_num+3),16))
-    print(idx)
+    idx = hex(g5 ^ int(K(4*round+3),16))
+    #print(idx)
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
     g6 = ftable[x][y] ^ g4
-
+    print("{:02x} {:02x} {:02x} {:02x} {:02x} {:02x}".format(g1,g2,g3,g4,g5,g6))
     return '{:x}{:x}'.format(g5,g6)
 
 def generate_subkeys():
@@ -270,9 +339,9 @@ def generate_subkeys():
         else:
             s3 = s3
         keys.append(s3)
-        # for k in range(len(keys)):
-        #     print(keys[k])
-        # print(k)
+    # for k in range(len(keys)):
+    #     print(keys[k])
+    # print(k)
 
 
 # https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
@@ -281,15 +350,13 @@ def K(x):
     global key_str
     z = x % 8
     a = z*2
-    print('new key: {}'.format(new_key))
     str = keys[new_key]
-    #print(keys[new_key])
     new_key += 1
     if(int(z) == 0):
-    #    print(str[-(a+2):])
+        #print(str[-(a+2):])
         return str[-(a+2):]
     else:
-   #     print(str[-(a+2):-a])
+        #print(str[-(a+2):-a])
         return str[-(a+2):-a]
 
 
@@ -307,10 +374,16 @@ def main():
         key_file = sys.argv[2]
 #        print_input_file_names()
     generate_subkeys()
-    read_plaintext(plaintext_file, 10)
+
+    # for i in range(16):
+    #     print(K(4*(i)) + " " + K(4*(i)+1) + " " + K(4*(i)+2) + " " + K(4*(i)+3) + " " +
+    #           K(4*(i)) + " " + K(4*(i)+1) + " " + K(4*(i)+2) + " " + K(4*(i)+3) + " " +
+    #           K(4*(i)) + " " + K(4*(i)+1) + " " + K(4*(i)+2) + " " + K(4*(i)+3))
+
+    read_plaintext(plaintext_file)
     read_hex_to_key(key_file)
 
-    encrypt()
+    encrypt_0()
     # K(0)
     # K(1)
     # K(2)
