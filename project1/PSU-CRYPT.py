@@ -145,14 +145,16 @@ def encrypt_0():
         rs[i] += temp
         temp.clear()
     round_num = 0
-    #print('{:02x} {:02x} '.format(rs[0][0],rs[0][1]) + '{:02x} {:02x} '.format(rs[1][0],rs[1][1]) +
-#          '{:02x} {:02x} '.format(rs[2][0],rs[2][1]) + '{:02x} {:02x} '.format(rs[3][0],rs[3][1]))
-    #print('F')
     R0 = rs[0]
     R1 = rs[1]
     R2 = rs[2]
     R3 = rs[3]
-    for _ in range(1):
+    for _ in range(16):
+        print('round {}'.format(_))
+        print(R0)
+        print(R1)
+        print(R2)
+        print(R3)
         F0, F1 = F(R0, R1, round_num)
         print('================')
         PREV_R0 = R0
@@ -160,34 +162,49 @@ def encrypt_0():
         print('---------')
         print('{:02x}{:02x}'.format(R2[0],R2[1]))
         print('{:02x}{:02x}'.format(R3[0],R3[1]))
-        R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0
-        R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1
-        print('{:04x}'.format(R0))
-        print('{:04x}'.format(R1))
-        whitening = '{:04x}'.format(R0) + '{:04x}'.format(R1) + '{:02x}{:02x}'.format(R2[0],R2[1]) + '{:02x}{:02x}'.format(R3[0],R3[1])
-        print(whitening)
-        R2 = [int('{:x}'.format(int('{:x}'.format(R0)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R0)[2:4],16)),16)]
-        R3 = [int('{:x}'.format(int('{:x}'.format(R1)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R1)[2:4],16)),16)]
+        print(hex(F0))
+        print(hex(F1))
+        R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0 # next R0
+        R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1 # next R1
 
+        print('RO: {:04x}'.format(R0))
+        print('R1: {:04x}'.format(R1))
+        # whitening = '{:04x}'.format(R0) + '{:04x}'.format(R1) + '{:02x}{:02x}'.format(R2[0],R2[1]) + '{:02x}{:02x}'.format(R3[0],R3[1])
+        # print(whitening)
+        print('{:04x}'.format(R0)[0:2])
+        R2 = [int('{:04x}'.format(R0)[0:2],16), int('{:04x}'.format(R0)[2:4],16)]
+        R3 = [int('{:04x}'.format(R1)[0:2],16), int('{:04x}'.format(R1)[2:4],16)]
+        # R2 = [int('{:x}'.format(int('{:x}'.format(R0)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R0)[2:4],16)),16)]
+        # R3 = [int('{:x}'.format(int('{:x}'.format(R1)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R1)[2:4],16)),16)]
+        R0 = R2
+        R1 = R3
+        print(R0)
+        print(R1)
+        print('r2r3')
         print(R2)
         print(R3)
-        #R2 = R0
-        #R3 = R1
-#        print('***************')
         round_num += 1
-#        print(_)
-    y0 = R2
-    y1 = R3
-    y2 = PREV_R0
-    y3 = PREV_R1
-    # print(hex(int('{:02x}{:02x}'.format(R2[0],R2[1]),16)))
-    # print(hex(int('{:02x}{:02x}'.format(R3[0],R3[1]),16)))
-    # print(hex(int('{:02x}{:02x}'.format(y0[0],y0[1]),16)))
-    # print(hex(int('{:02x}{:02x}'.format(y1[0],y1[1]),16)))
-    cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:02x}{:02x}'.format(y2[0],y2[1]) + '{:02x}{:02x}'.format(y3[0],y3[1])
-    # cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:04x}'.format(y2) + '{:04x}'.format(y3)
-    print('cipher')
-    print(cipher)
+        y0 = R2
+        y1 = R3
+        y2 = PREV_R0
+        y3 = PREV_R1
+        R2 = PREV_R0
+        R3 = PREV_R1
+        print(y2)
+        print(y3)
+        print(hex(y0[0]))
+        print(hex(y0[1]))
+        print(hex(y1[0]))
+        print(hex(y1[1]))
+        print(hex(y2[0]))
+        print(hex(y2[1]))
+        print(hex(y3[0]))
+        print(hex(y3[1]))
+        cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:02x}{:02x}'.format(y2[0],y2[1]) + '{:x}{:x}'.format(y3[0],y3[1])
+        # cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:04x}'.format(y2) + '{:04x}'.format(y3)
+        print('cipher')
+        print(cipher)
+        print("#########################")
     return cipher
 
 
@@ -251,17 +268,20 @@ def F(R0, R1, round):
     global rs
     F0 = 0
     F1 = 0
-    # print(R0)
-    # print(R1)
+    print('hhhh')
+    print(R0)
+    print(R1)
     # print(rs[0])
-    T0 = G(rs[0], round)
-    T1 = G(rs[1], round)
+    #T0 = G(rs[0], round)
+    T0 = G(R0, round)
+    T1 = G(R1, round)
+    #T1 = G(rs[1], round)
     F0 = (int(T0,16) + 2*int(T1,16) +  int(K(4*round)+K(4*round+1), 16)) % 2**16
     F1 = (2*int(T0,16)+int(T1,16) + int(K(4*round+2)+K(4*round+3), 16)) % 2**16
 
-    print(T0,T1)
+    print('Ts: {} {}'.format(T0,T1))
     # print(T1)
-    print(hex(F0),hex(F1))
+    print('Fs: {} {}'.format(hex(F0),hex(F1)))
     # print(hex(F1))
     return F0, F1
 
@@ -294,8 +314,8 @@ def G(w, round):
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
     g6 = ftable[x][y] ^ g4
-    print("{:02x} {:02x} {:02x} {:02x} {:02x} {:02x}".format(g1,g2,g3,g4,g5,g6))
-    return '{:x}{:x}'.format(g5,g6)
+    print("gs: {:02x} {:02x} {:02x} {:02x} {:02x} {:02x}".format(g1,g2,g3,g4,g5,g6))
+    return '{:02x}{:02x}'.format(g5,g6)
 
 def generate_subkeys():
     global new_key
@@ -353,10 +373,10 @@ def K(x):
     str = keys[new_key]
     new_key += 1
     if(int(z) == 0):
-        #print(str[-(a+2):])
+        print("K: " + str[-(a+2):])
         return str[-(a+2):]
     else:
-        #print(str[-(a+2):-a])
+        print("K: " + str[-(a+2):-a])
         return str[-(a+2):-a]
 
 
