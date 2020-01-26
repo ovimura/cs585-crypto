@@ -7,6 +7,7 @@ import sys
 import binascii
 
 plaintext_file = None
+ciphertext_file = None
 key_file = None
 
 bit_bock_size = 64
@@ -14,11 +15,11 @@ bit_key_size = 64
 round_num = 0
 
 ws = {}
+cs = {}
 key = {}
 rs = {}
 keys = []
 key_str = None
-ddd = None
 new_key = 0
 current_used_keys = {}
 
@@ -78,6 +79,26 @@ def read_plaintext(file):
         for j in range(i, i+x):
             temp.append(d[j])
         ws[idx] += (temp)
+        idx += 1
+        temp.clear()
+    return s
+
+def read_ciphertext(file='ciphertext.txt'):
+    global cs
+    with open(file) as f:
+        data = f.read()
+    s = "".join("0x{:02x} ".format(ord(c)) for c in data)
+    d = data.encode()[:-1]
+    x = 16
+    idx = 0
+    temp = []
+    for i in range(0,len(d), 4):
+        cs[idx] = []
+        x = len(d) % 4 if(len(d)<i+x) else 4
+        for j in range(i, i+x,2):
+            #print(d[j:j+2])
+            temp.append(int(d[j:j+2],16))
+        cs[idx] += (temp)
         idx += 1
         temp.clear()
     return s
@@ -153,6 +174,94 @@ def encrypt_0():
     rr2 = None
     rr3 = None
     print('\nENCRYPTION')
+    for _ in range(16):
+        current_used_keys[round_num] = []
+        print('\nBeginning of Round: {}'.format(_))
+        F0, F1 = F(R0, R1, round_num)
+        PREV_R0 = R0
+        PREV_R1 = R1
+        R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0 # next R0
+        R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1 # next R1
+        R2 = [int('{:04x}'.format(R0)[0:2],16), int('{:04x}'.format(R0)[2:4],16)]
+        R3 = [int('{:04x}'.format(R1)[0:2],16), int('{:04x}'.format(R1)[2:4],16)]
+        R0 = R2
+        R1 = R3
+        print('Subkeys used:', end=" ")
+        y = ''
+        [print("0x{} ".format(x),end=" ") for x in current_used_keys[round_num]]
+        round_num += 1
+        y0 = R2
+        y1 = R3
+        y2 = PREV_R0
+        y3 = PREV_R1
+
+        rr0 = y2
+        rr1 = y3
+        rr2 = y0
+        rr3 = y1
+
+        R2 = PREV_R0
+        R3 = PREV_R1
+        cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:02x}{:02x}'.format(y2[0],y2[1]) + '{:x}{:x}'.format(y3[0],y3[1])
+        print('\nBlock: 0x{}'.format(cipher))
+        print('End of Round: {}'.format(_))
+    yy0 = rr0
+    yy1 = rr1
+    yy2 = rr2
+    yy3 = rr3
+    cipher = '{:02x}{:02x}'.format(yy0[0],yy0[1]) + '{:02x}{:02x}'.format(yy1[0],yy1[1]) + '{:02x}{:02x}'.format(yy2[0],yy2[1]) + '{:x}{:x}'.format(yy3[0],yy3[1])
+    temp = []
+    c = {}
+    m = 4
+    idx = 0
+    for i in range(0,16,4):
+        w = cipher[i:(i+4)]
+        k = key[(i-m)%4]
+        m-=1
+        c[idx] = []
+        id = 0
+        for j in range(0,4,2):
+            temp.append(int(w[j:(j+2)],16) ^ int(k[id],16))
+            id+=1
+        c[idx] += temp
+        idx+=1
+        temp.clear()
+    cc = ''
+    for n in range(4):
+        cc += '{:02x}'.format(c[n][0])
+        cc += '{:02x}'.format(c[n][1])
+    print("\nCiphertext: " + cc)
+    print('\nb3db233bb437c713')
+    print(cipher)
+    return cipher
+
+def decrypt():
+    print('\nDECRYPTION\n')
+    global round_num
+    global ws
+    global cs
+    global key
+    global current_used_keys
+    temp = []
+    print(ws)
+    ws = cs
+    for i in range(4):
+        w = ws[i]
+        k = key[i]
+        rs[i] = []
+        for j in range(2):
+            temp.append(w[j] ^ int(k[j],16))
+        rs[i] += temp
+        temp.clear()
+    round_num = 0
+    R0 = rs[0]
+    R1 = rs[1]
+    R2 = rs[2]
+    R3 = rs[3]
+    rr0 = None
+    rr1 = None
+    rr2 = None
+    rr3 = None
     for _ in range(16):
         current_used_keys[round_num] = []
         print('\nBeginning of Round: {}'.format(_))
@@ -373,10 +482,17 @@ def K(x):
         current_used_keys[round_num].append(str[-(a+2):-a])
         return str[-(a+2):-a]
 
+def K_decrypt(r, z):
+    global current_used_keys
+    print(current_used_keys[r][z])
+    return current_used_keys[r][z]
+
+
 def main():
     global plaintext_file
     global key_file
-    global ddd
+    global cs
+    global current_used_keys
     if (len(sys.argv) != 3):
         print()
         print("error: incorrect number of arguments -> {}\n".format(len(sys.argv)))
@@ -390,8 +506,15 @@ def main():
 
     read_plaintext(plaintext_file)
     read_hex_to_key(key_file)
+    print('$$$$$$$$$$$$$$$--->')
+    read_ciphertext()
 
-    encrypt_0()
+    print(cs)
+#    encrypt_0()
+
+    decrypt()
+
+    #print(current_used_keys)
 
 
 if __name__ == '__main__':
