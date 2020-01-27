@@ -151,8 +151,6 @@ def encrypt_0():
     global current_used_keys
     global ciphertext_file
     global rs
-    print(ws)
-    print(key)
     temp = []
     for i in range(4):
         w = ws[i]
@@ -266,9 +264,8 @@ def decrypt():
     rr1 = None
     rr2 = None
     rr3 = None
-    index = 16
-    round = 15
-    for _ in range(16):
+    round = 19
+    for _ in range(20):
         print('\nBeginning of Round: {}'.format(round))
         F0, F1 = F_decrypt(R0, R1, round)
         PREV_R0 = R0
@@ -333,68 +330,9 @@ def decrypt():
     print("\nPlaintext ASCII: " + cc)
     return cipher
 
-
-def encrypt():
-    global round_num
-    global ws
-    global key
-    global rs
-    temp = []
-    for i in range(4):
-        w = ws[i]
-        k = key[i]
-        rs[i] = []
-        for j in range(2):
-            temp.append(w[j] ^ int(k[j],16))
-        rs[i] += temp
-        temp.clear()
-    print('rounds')
-    round_num = 0
-    print(rs)
-    print('F')
-    R0 = rs[0]
-    R1 = rs[1]
-    R2 = rs[2]
-    R3 = rs[3]
-    for _ in range(1):
-        F0, F1 = F(R0, R1, round_num)
-        print(hex(F0))
-        print(hex(F1))
-        print(R0)
-        print(R1)
-        print('================')
-        R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0
-        R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1
-        R2 = [int('{:x}'.format(int('{:x}'.format(R0)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R0)[2:4],16)),16)]
-        R3 = [int('{:x}'.format(int('{:x}'.format(R1)[0:2],16)),16),int('{:x}'.format(int('{:x}'.format(R1)[2:4],16)),16)]
-        print(R2)
-        print(R3)
-        #R2 = R0
-        #R3 = R1
-        print('***************')
-        round_num += 1
-        print(_)
-    y0 = R2
-    y1 = R3
-    y2 = R0
-    y3 = R1
-    print(hex(int('{:02x}{:02x}'.format(R2[0],R2[1]),16)))
-    print(hex(int('{:02x}{:02x}'.format(R3[0],R3[1]),16)))
-    print(hex(int('{:02x}{:02x}'.format(y0[0],y0[1]),16)))
-    print(hex(int('{:02x}{:02x}'.format(y1[0],y1[1]),16)))
-    cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:04x}'.format(y2) + '{:04x}'.format(y3)
-    print(cipher)
-    return cipher
-
 def F(R0, R1, round):
-    print('F')
-    print(round)
-    print(R0, R1, round)
     T0 = G(R0, round)
     T1 = G(R1, round)
-    print(R0)
-    print(R1)
-    print('R1111111111')
     F0 = (int(T0,16) + 2*int(T1,16) +  int(K(4*round)+K(4*round+1), 16)) % 2**16
     F1 = (2*int(T0,16)+int(T1,16) + int(K(4*round+2)+K(4*round+3), 16)) % 2**16
 
@@ -415,19 +353,13 @@ def F_decrypt(R0, R1, round):
 def G(w, round):
     g1 = w[0]
     g2 = w[1]
-    print('----')
-    print(g1, g2)
-    print(type(g2))
+
     # g3
     de = int(K(4*round),16)
-    print(de)
     idx = hex(g2 ^ int(de))
-    print(idx)
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
-    print(x,y)
     g3 = ftable[x][y] ^ g1
-    #exit(3)
 
     # g4
     idx = hex(g3 ^ int(K(4*round+1),16))
@@ -455,7 +387,8 @@ def G_decrypt(w, round, v):
     g2 = w[1]
 
     # g3
-    idx = hex(g2 ^ int(K_decrypt(round, v),16))
+    de = int(K_decrypt(round, v),16)
+    idx = hex(g2 ^ de)
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
     g3 = ftable[x][y] ^ g1
@@ -484,28 +417,13 @@ def generate_subkeys():
     global new_key
     global key
     global key_str
-    print(key_str)
 
-    # s1 = "{:b}".format(int(key_str,16))
-    # if(len(s1)<80):
-    #     n = len(s1)
-    #     for _ in range(n,80):
-    #         s1 = '0'+s1
     result = leftRotate(int(key_str,16),1)
-    s = "{:b}".format(int(bin(result),2))
-    #print(bin(result)[-80:])
     kk = '{0:x}'.format(int(bin(result)[-80:],2))
-
     keys.append(kk)
     j = 1
     for i in range(1,240):
         j = 1
-        # s1 = "{:b}".format(int(keys[i-1],16))
-        # if(len(s1)<80):
-        #     n = len(s1)
-        #     for _ in range(n,80):
-        #         s1 = '0'+s1
-#        print(keys[i-1])
         result = leftRotate(int(keys[i-1],16),1)
         ss = '{0:b}'.format(result)
         ss = ss[-80:]
@@ -517,13 +435,8 @@ def generate_subkeys():
         else:
             s2 = ss
         ss = s2
-        #print(ss)
-        # s = "{:b}".format(int(ss,2))
-        # print(s)
         kk = '{0:x}'.format(int(ss,2))
         s3 = kk
-        # print(s3)
-        # exit(3)
         if(len(s3)<20):
             n = len(s3)
             for _ in range(n,20):
@@ -531,9 +444,8 @@ def generate_subkeys():
         else:
             s3 = s3
         keys.append(s3)
-    #exit(3)
-    for v in range(len(keys)):
-        print(keys[v])
+    # for v in range(len(keys)):
+    #     print(keys[v])
 
 # https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
 def K(x):
@@ -546,11 +458,11 @@ def K(x):
     str = keys[new_key]
     new_key += 1
     if(int(z) == 0):
-        print("K: " + str[-(a+2):])
+        #print("K: " + str[-(a+2):])
         current_used_keys[round_num].append(str[-(a+2):])
         return str[-(a+2):]
     else:
-        print("K: " + str[-(a+2):-a])
+        #print("K: " + str[-(a+2):-a])
         current_used_keys[round_num].append(str[-(a+2):-a])
         return str[-(a+2):-a]
 
