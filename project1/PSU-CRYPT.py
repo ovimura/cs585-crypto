@@ -243,7 +243,7 @@ def decrypt():
     global key
     global current_used_keys
     temp = []
-    print(ws)
+    print(cs)
     ws = cs
     for i in range(4):
         w = ws[i]
@@ -258,16 +258,24 @@ def decrypt():
     R1 = rs[1]
     R2 = rs[2]
     R3 = rs[3]
+    # R0 = cs[0]
+    # R1 = cs[1]
+    # R2 = cs[2]
+    # R3 = cs[3]
+
     rr0 = None
     rr1 = None
     rr2 = None
     rr3 = None
+    index = 16
+    round = 15
     for _ in range(16):
-        current_used_keys[round_num] = []
-        print('\nBeginning of Round: {}'.format(_))
-        F0, F1 = F(R0, R1, round_num)
+        print('\nBeginning of Round: {}'.format(round))
+        F0, F1 = F_decrypt(R0, R1, round)
         PREV_R0 = R0
         PREV_R1 = R1
+        print('r0')
+        print(R0)
         R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0 # next R0
         R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1 # next R1
         R2 = [int('{:04x}'.format(R0)[0:2],16), int('{:04x}'.format(R0)[2:4],16)]
@@ -276,8 +284,8 @@ def decrypt():
         R1 = R3
         print('Subkeys used:', end=" ")
         y = ''
-        [print("0x{} ".format(x),end=" ") for x in current_used_keys[round_num]]
-        round_num += 1
+        [print("0x{} ".format(x),end=" ") for x in current_used_keys[round]]
+        round -= 1
         y0 = R2
         y1 = R3
         y2 = PREV_R0
@@ -388,6 +396,17 @@ def F(R0, R1, round):
     print('f0: {} f1: {}'.format(hex(F0),hex(F1)))
     return F0, F1
 
+def F_decrypt(R0, R1, round):
+    T0 = G_decrypt(R0, round, 0)
+    T1 = G_decrypt(R1, round, 4)
+    F0 = (int(T0,16) + 2*int(T1,16) +  int(K_decrypt(round,8)+K_decrypt(round,9), 16)) % 2**16
+    F1 = (2*int(T0,16)+int(T1,16) + int(K_decrypt(round,10)+K_decrypt(round,11), 16)) % 2**16
+
+    print('t0: {} t1: {}'.format(T0,T1))
+    print('f0: {} f1: {}'.format(hex(F0),hex(F1)))
+    return F0, F1
+
+
 def G(w, round):
     g1 = w[0]
     g2 = w[1]
@@ -419,6 +438,43 @@ def G(w, round):
     g6 = ftable[x][y] ^ g4
     print("g1: {:02x} g2: {:02x} g3: {:02x} g4: {:02x} g5: {:02x} g6: {:02x}".format(g1,g2,g3,g4,g5,g6))
     return '{:02x}{:02x}'.format(g5,g6)
+
+def G_decrypt(w, round, v):
+    g1 = w[0]
+    g2 = w[1]
+
+    # g3
+    idx = hex(g2 ^ int(K_decrypt(round, v),16))
+    print(K_decrypt(round, 3+v))
+    print('g_decrypt')
+    print(idx)
+    # print(idx)
+    x = int(idx[-2:-1],16) if len(idx) == 4 else 0
+    y = int(idx[-1:],16)
+    print(x,y)
+    g3 = ftable[x][y] ^ g1
+
+    # g4
+    idx = hex(g3 ^ int(K_decrypt(round, 1+v),16))
+    x = int(idx[-2:-1],16) if len(idx) == 4 else 0
+    y = int(idx[-1:],16)
+    g4 = ftable[x][y] ^ g2
+
+    # g5
+    idx = hex(g4 ^ int(K_decrypt(round, 2+v),16))
+    x = int(idx[-2:-1],16) if len(idx) == 4 else 0
+    y = int(idx[-1:],16)
+    g5 = ftable[x][y] ^ g3
+
+    # g6
+    idx = hex(g5 ^ int(K_decrypt(round, 3+v),16))
+    # print(idx)
+    x = int(idx[-2:-1],16) if len(idx) == 4 else 0
+    y = int(idx[-1:],16)
+    g6 = ftable[x][y] ^ g4
+    print("g1: {:02x} g2: {:02x} g3: {:02x} g4: {:02x} g5: {:02x} g6: {:02x}".format(g1,g2,g3,g4,g5,g6))
+    return '{:02x}{:02x}'.format(g5,g6)
+
 
 def generate_subkeys():
     global new_key
@@ -474,16 +530,18 @@ def K(x):
     str = keys[new_key]
     new_key += 1
     if(int(z) == 0):
-        # print("K: " + str[-(a+2):])
+        print("K: " + str[-(a+2):])
         current_used_keys[round_num].append(str[-(a+2):])
         return str[-(a+2):]
     else:
-        # print("K: " + str[-(a+2):-a])
+        print("K: " + str[-(a+2):-a])
         current_used_keys[round_num].append(str[-(a+2):-a])
         return str[-(a+2):-a]
 
 def K_decrypt(r, z):
     global current_used_keys
+    print(r,z)
+    #print(current_used_keys)
     print(current_used_keys[r][z])
     return current_used_keys[r][z]
 
@@ -510,11 +568,11 @@ def main():
     read_ciphertext()
 
     print(cs)
-#    encrypt_0()
+    encrypt_0()
 
     decrypt()
 
-    #print(current_used_keys)
+    print(current_used_keys)
 
 
 if __name__ == '__main__':
