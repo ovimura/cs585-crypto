@@ -88,7 +88,8 @@ def read_ciphertext(file='ciphertext.txt'):
     with open(file) as f:
         data = f.read()
     s = "".join("0x{:02x} ".format(ord(c)) for c in data)
-    d = data.encode()[:-1]
+    d = data.encode()[:-1] if len(data.encode()) % 16 != 0 else data.encode()
+
     x = 16
     idx = 0
     temp = []
@@ -155,6 +156,7 @@ def encrypt_0():
     global ws
     global key
     global current_used_keys
+    global ciphertext_file
     temp = []
     for i in range(4):
         w = ws[i]
@@ -230,6 +232,8 @@ def encrypt_0():
     for n in range(4):
         cc += '{:02x}'.format(c[n][0])
         cc += '{:02x}'.format(c[n][1])
+    with open(ciphertext_file,'w') as f:
+        f.write(cc)
     print("\nCiphertext HEX: 0x" + cc)
     # print(cipher)
     return cipher
@@ -543,14 +547,16 @@ def main():
     global key_file
     global cs
     global current_used_keys
-    if (len(sys.argv) != 3):
+    global ciphertext_file
+    if (len(sys.argv) != 4):
         print()
         print("error: incorrect number of arguments -> {}\n".format(len(sys.argv)))
-        print("usage: [python | python3] PSU-CRYPT.py <plaintext.txt> <key.txt>")
+        print("usage: [python | python3] PSU-CRYPT.py <plaintext.txt> <key.txt> <ciphertext.txt>")
         exit(1)
     else:
         plaintext_file = sys.argv[1]
         key_file = sys.argv[2]
+        ciphertext_file = sys.argv[3]
 #        print_input_file_names()
     generate_subkeys()
     read_plaintext(plaintext_file)
