@@ -230,9 +230,8 @@ def encrypt_0():
     for n in range(4):
         cc += '{:02x}'.format(c[n][0])
         cc += '{:02x}'.format(c[n][1])
-    print("\nCiphertext: " + cc)
-    print('\nb3db233bb437c713')
-    print(cipher)
+    print("\nCiphertext HEX: 0x" + cc)
+    # print(cipher)
     return cipher
 
 def decrypt():
@@ -243,7 +242,7 @@ def decrypt():
     global key
     global current_used_keys
     temp = []
-    print(cs)
+    # print(cs)
     ws = cs
     for i in range(4):
         w = ws[i]
@@ -274,8 +273,8 @@ def decrypt():
         F0, F1 = F_decrypt(R0, R1, round)
         PREV_R0 = R0
         PREV_R1 = R1
-        print('r0')
-        print(R0)
+        # print('r0')
+        # print(R0)
         R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0 # next R0
         R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1 # next R1
         R2 = [int('{:04x}'.format(R0)[0:2],16), int('{:04x}'.format(R0)[2:4],16)]
@@ -285,7 +284,6 @@ def decrypt():
         print('Subkeys used:', end=" ")
         y = ''
         [print("0x{} ".format(x),end=" ") for x in current_used_keys[round]]
-        round -= 1
         y0 = R2
         y1 = R3
         y2 = PREV_R0
@@ -300,7 +298,9 @@ def decrypt():
         R3 = PREV_R1
         cipher = '{:02x}{:02x}'.format(y0[0],y0[1]) + '{:02x}{:02x}'.format(y1[0],y1[1]) + '{:02x}{:02x}'.format(y2[0],y2[1]) + '{:x}{:x}'.format(y3[0],y3[1])
         print('\nBlock: 0x{}'.format(cipher))
-        print('End of Round: {}'.format(_))
+        print('End of Round: {}'.format(round))
+        round -= 1
+
     yy0 = rr0
     yy1 = rr1
     yy2 = rr2
@@ -323,12 +323,14 @@ def decrypt():
         idx+=1
         temp.clear()
     cc = ''
+    h = ''
     for n in range(4):
+        h += '{:02x}'.format(c[n][0])
+        h += '{:02x}'.format(c[n][1])
         cc += chr(int('{:02x}'.format(c[n][0]),16))
         cc += chr(int('{:02x}'.format(c[n][1]),16))
-    print("\nPlaintext: " + cc)
-    print('\nb3db233bb437c713')
-    print(cipher)
+    print("\nPlaintext HEX: 0x" + h)
+    print("\nPlaintext ASCII: " + cc)
     return cipher
 
 
@@ -406,7 +408,6 @@ def F_decrypt(R0, R1, round):
     print('f0: {} f1: {}'.format(hex(F0),hex(F1)))
     return F0, F1
 
-
 def G(w, round):
     g1 = w[0]
     g2 = w[1]
@@ -445,13 +446,8 @@ def G_decrypt(w, round, v):
 
     # g3
     idx = hex(g2 ^ int(K_decrypt(round, v),16))
-    print(K_decrypt(round, 3+v))
-    print('g_decrypt')
-    print(idx)
-    # print(idx)
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
-    print(x,y)
     g3 = ftable[x][y] ^ g1
 
     # g4
@@ -468,7 +464,6 @@ def G_decrypt(w, round, v):
 
     # g6
     idx = hex(g5 ^ int(K_decrypt(round, 3+v),16))
-    # print(idx)
     x = int(idx[-2:-1],16) if len(idx) == 4 else 0
     y = int(idx[-1:],16)
     g6 = ftable[x][y] ^ g4
@@ -530,19 +525,16 @@ def K(x):
     str = keys[new_key]
     new_key += 1
     if(int(z) == 0):
-        print("K: " + str[-(a+2):])
+        # print("K: " + str[-(a+2):])
         current_used_keys[round_num].append(str[-(a+2):])
         return str[-(a+2):]
     else:
-        print("K: " + str[-(a+2):-a])
+        # print("K: " + str[-(a+2):-a])
         current_used_keys[round_num].append(str[-(a+2):-a])
         return str[-(a+2):-a]
 
 def K_decrypt(r, z):
     global current_used_keys
-    print(r,z)
-    #print(current_used_keys)
-    print(current_used_keys[r][z])
     return current_used_keys[r][z]
 
 
@@ -561,19 +553,11 @@ def main():
         key_file = sys.argv[2]
 #        print_input_file_names()
     generate_subkeys()
-
     read_plaintext(plaintext_file)
     read_hex_to_key(key_file)
-    print('$$$$$$$$$$$$$$$--->')
     read_ciphertext()
-
-    print(cs)
     encrypt_0()
-
     decrypt()
-
-    print(current_used_keys)
-
 
 if __name__ == '__main__':
     main()
