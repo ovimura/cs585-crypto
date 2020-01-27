@@ -324,9 +324,9 @@ def decrypt():
         temp.clear()
     cc = ''
     for n in range(4):
-        cc += '{:02x}'.format(c[n][0])
-        cc += '{:02x}'.format(c[n][1])
-    print("\nCiphertext: " + cc)
+        cc += chr(int('{:02x}'.format(c[n][0]),16))
+        cc += chr(int('{:02x}'.format(c[n][1]),16))
+    print("\nPlaintext: " + cc)
     print('\nb3db233bb437c713')
     print(cipher)
     return cipher
