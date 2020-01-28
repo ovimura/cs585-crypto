@@ -270,8 +270,6 @@ def decrypt():
         F0, F1 = F_decrypt(R0, R1, round)
         PREV_R0 = R0
         PREV_R1 = R1
-        # print('r0')
-        # print(R0)
         R0 = int('{:02x}{:02x}'.format(R2[0],R2[1]),16) ^ F0 # next R0
         R1 = int('{:02x}{:02x}'.format(R3[0],R3[1]),16) ^ F1 # next R1
         R2 = [int('{:04x}'.format(R0)[0:2],16), int('{:04x}'.format(R0)[2:4],16)]
@@ -341,8 +339,8 @@ def F(R0, R1, round):
     return F0, F1
 
 def F_decrypt(R0, R1, round):
-    T0 = G_decrypt(R0, round, 0)
     T1 = G_decrypt(R1, round, 4)
+    T0 = G_decrypt(R0, round, 0)
     F0 = (int(T0,16) + 2*int(T1,16) +  int(K_decrypt(round,8)+K_decrypt(round,9), 16)) % 2**16
     F1 = (2*int(T0,16)+int(T1,16) + int(K_decrypt(round,10)+K_decrypt(round,11), 16)) % 2**16
 
