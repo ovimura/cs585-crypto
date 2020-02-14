@@ -58,7 +58,7 @@ def read_plaintext(file):
     s = "".join("0x{:02x} ".format(ord(c)) for c in data)
     d = data.encode()[:-1]
     print(len(d))
-    blocks_num = math.trunc(len(d))
+    blocks_num = math.trunc(len(d)) + 0 if (len(d) % 8 == 0) else 1
     x = 8
     idx = 0
     temp = []
@@ -156,9 +156,12 @@ def encrypt():
     global current_used_keys
     global ciphertext_file
     global rs
+    global blocks_num
     temp = []
+    print('ws inside encrypt')
+    print(ws)
     for i in range(4):
-        w = ws[i]
+        w = ws[i+4]
         k = key[i]
         rs[i] = []
         for j in range(2):
@@ -493,6 +496,8 @@ def main():
     global cs
     global current_used_keys
     global ciphertext_file
+    global ws
+    global blocks_num
     if (len(sys.argv) != 4):
         print()
         print("error: incorrect number of arguments -> {}\n".format(len(sys.argv)))
@@ -505,9 +510,15 @@ def main():
 #        print_input_file_names()
     generate_subkeys()
     read_plaintext(plaintext_file)
+    del ws[0]
+    del ws[1]
+    del ws[2]
+    del ws[3]
+    blocks_num += 1
+    print(ws)
     read_hex_to_key(key_file)
-    # encrypt()
-    generate_12_subkeys()
+    encrypt()
+#    generate_12_subkeys()
 #    print(current_used_keys)
 #    exit(3)
     read_ciphertext()
