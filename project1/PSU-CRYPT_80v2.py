@@ -330,6 +330,8 @@ def decrypt():
         cc += chr(int('{:02x}'.format(c[n][1]),16))
     print("\nPlaintext HEX: 0x" + h)
     print("\nPlaintext ASCII: " + cc)
+    with open("decrypted_ciphertext.txt","+a") as f:
+        f.write(cc)
     return cipher
 
 def F(R0, R1, round):
@@ -514,28 +516,36 @@ def main():
     generate_subkeys()
     read_plaintext(plaintext_file)
     open('ciphertext.txt','w').close()
-    encrypt()
-    # del ws[0]
-    # del ws[1]
-    # del ws[2]
-    # del ws[3]
-    blocks_num += 1
-    new_key = 0
-    print(ws)
-    encrypt()
-
+    for x in range(plaintext_num_of_blocks):
+        encrypt()
+        # del ws[0]
+        # del ws[1]
+        # del ws[2]
+        # del ws[3]
+        blocks_num += 1
+        new_key = 0
+        #print(ws)
+        #encrypt()
+        print(plaintext_num_of_blocks)
+    #exit(3)
 #    generate_12_subkeys()
 #    print(current_used_keys)
 #    exit(3)
     read_ciphertext()
     blocks_num = 0
-    decrypt()
-    del cs[0]
-    del cs[1]
-    del cs[2]
-    del cs[3]
-    blocks_num += 1
-    decrypt()
+    open('decrypted_ciphertext.txt','w').close()
+    for y in range(plaintext_num_of_blocks):
+        decrypt()
+    # del cs[0]
+    # del cs[1]
+    # del cs[2]
+    # del cs[3]
+        blocks_num += 1
+    #decrypt()
+    with open('decrypted_ciphertext.txt','r') as f:
+        dt = f.read()
+    print('Decrypted ciphertext: ', end="")
+    print(dt)
 
 if __name__ == '__main__':
     main()
