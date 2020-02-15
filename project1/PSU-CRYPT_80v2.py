@@ -52,13 +52,12 @@ def print_input_file_names():
 
 def read_plaintext(file):
     global ws
-    global blocks_num
+    global plaintext_num_of_blocks
     with open(file) as f:
         data = f.read()
     s = "".join("0x{:02x} ".format(ord(c)) for c in data)
     d = data.encode()[:-1]
-    print(len(d))
-    blocks_num = math.trunc(len(d)) + 0 if (len(d) % 8 == 0) else 1
+    plaintext_num_of_blocks = math.trunc(len(d)/8) + 0 if (len(d) % 8 == 0) else 1
     x = 8
     idx = 0
     temp = []
@@ -147,7 +146,7 @@ def read_hex_to_key(file='key.txt'):
         temp.clear()
     return key_str
 
-read_hex_to_key()
+#read_hex_to_key()
 
 def encrypt():
     global round_num
@@ -161,7 +160,7 @@ def encrypt():
     print('ws inside encrypt')
     print(ws)
     for i in range(4):
-        w = ws[i+4]
+        w = ws[i+4*blocks_num]
         k = key[i]
         rs[i] = []
         for j in range(2):
@@ -234,7 +233,7 @@ def encrypt():
     for n in range(4):
         cc += '{:02x}'.format(c[n][0])
         cc += '{:02x}'.format(c[n][1])
-    with open(ciphertext_file,'w') as f:
+    with open(ciphertext_file,'+a') as f:
         f.write(cc)
     print("\nCiphertext HEX: 0x" + cc)
     # print(cipher)
@@ -247,10 +246,12 @@ def decrypt():
     global cs
     global key
     global current_used_keys
+    global blocks_num
+    print(cs)
     temp = []
     ws = cs
     for i in range(4):
-        w = ws[i]
+        w = ws[i+4*blocks_num]
         k = key[i]
         rs[i] = []
         for j in range(2):
@@ -498,6 +499,7 @@ def main():
     global ciphertext_file
     global ws
     global blocks_num
+    global new_key
     if (len(sys.argv) != 4):
         print()
         print("error: incorrect number of arguments -> {}\n".format(len(sys.argv)))
@@ -508,20 +510,31 @@ def main():
         key_file = sys.argv[2]
         ciphertext_file = sys.argv[3]
 #        print_input_file_names()
+    read_hex_to_key(key_file)
     generate_subkeys()
     read_plaintext(plaintext_file)
-    del ws[0]
-    del ws[1]
-    del ws[2]
-    del ws[3]
-    blocks_num += 1
-    print(ws)
-    read_hex_to_key(key_file)
+    open('ciphertext.txt','w').close()
     encrypt()
+    # del ws[0]
+    # del ws[1]
+    # del ws[2]
+    # del ws[3]
+    blocks_num += 1
+    new_key = 0
+    print(ws)
+    encrypt()
+
 #    generate_12_subkeys()
 #    print(current_used_keys)
 #    exit(3)
     read_ciphertext()
+    blocks_num = 0
+    decrypt()
+    del cs[0]
+    del cs[1]
+    del cs[2]
+    del cs[3]
+    blocks_num += 1
     decrypt()
 
 if __name__ == '__main__':
