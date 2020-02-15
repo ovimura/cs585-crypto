@@ -74,6 +74,7 @@ def read_plaintext(file):
 
 def read_ciphertext(file='ciphertext.txt'):
     global cs
+    global plaintext_num_of_blocks
     c_str = ''
     with open(file,'r') as f:
         data = f.read()
@@ -83,7 +84,7 @@ def read_ciphertext(file='ciphertext.txt'):
         c_str = data#[:-1]
     s = "".join("0x{:02x} ".format(ord(c)) for c in c_str)
     d = c_str.encode()[:-1] if len(c_str.encode()) % 16 != 0 else c_str.encode()
-
+    plaintext_num_of_blocks = math.trunc(len(d)/16) + 0 if (len(d) % 16 == 0) else 1
     x = 16
     idx = 0
     temp = []
@@ -514,34 +515,25 @@ def main():
 #        print_input_file_names()
     read_hex_to_key(key_file)
     generate_subkeys()
+
     read_plaintext(plaintext_file)
     open('ciphertext.txt','w').close()
     for x in range(plaintext_num_of_blocks):
         encrypt()
-        # del ws[0]
-        # del ws[1]
-        # del ws[2]
-        # del ws[3]
         blocks_num += 1
         new_key = 0
-        #print(ws)
-        #encrypt()
-        print(plaintext_num_of_blocks)
-    #exit(3)
+
+#print(plaintext_num_of_blocks)
+
 #    generate_12_subkeys()
 #    print(current_used_keys)
-#    exit(3)
+
     read_ciphertext()
     blocks_num = 0
     open('decrypted_ciphertext.txt','w').close()
     for y in range(plaintext_num_of_blocks):
         decrypt()
-    # del cs[0]
-    # del cs[1]
-    # del cs[2]
-    # del cs[3]
         blocks_num += 1
-    #decrypt()
     with open('decrypted_ciphertext.txt','r') as f:
         dt = f.read()
     print('Decrypted ciphertext: ', end="")
