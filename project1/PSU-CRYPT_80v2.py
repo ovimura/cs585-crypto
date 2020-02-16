@@ -158,8 +158,6 @@ def encrypt():
     global rs
     global blocks_num
     temp = []
-    print('ws inside encrypt')
-    print(ws)
     for i in range(4):
         w = ws[i+4*blocks_num]
         k = key[i]
@@ -237,7 +235,6 @@ def encrypt():
     with open(ciphertext_file,'+a') as f:
         f.write(cc)
     print("\nCiphertext HEX: 0x" + cc)
-    # print(cipher)
     return cipher
 
 def decrypt():
@@ -503,41 +500,60 @@ def main():
     global ws
     global blocks_num
     global new_key
-    if (len(sys.argv) != 4):
+    op = None
+    if (len(sys.argv) != 5):
         print()
         print("error: incorrect number of arguments -> {}\n".format(len(sys.argv)))
-        print("usage: [python | python3] PSU-CRYPT.py <plaintext.txt> <key.txt> <ciphertextt.txt>")
+        print("usage: [python | python3] PSU-CRYPT.py -<e|d> <plaintext.txt> <key.txt> <ciphertext.txt>")
+        print("       -<e|d>   e: encryption, d: decryption")
+        print("       <plaintext.txt>   the plaintext")
+        print("       <key.txt>   the key")
+        print("       <ciphertext.txt>   the ciphertext")
         exit(1)
     else:
-        plaintext_file = sys.argv[1]
-        key_file = sys.argv[2]
-        ciphertext_file = sys.argv[3]
+        op = sys.argv[1]
+        plaintext_file = sys.argv[2]
+        key_file = sys.argv[3]
+        ciphertext_file = sys.argv[4]
 #        print_input_file_names()
     read_hex_to_key(key_file)
     generate_subkeys()
-
-    read_plaintext(plaintext_file)
-    open('ciphertext.txt','w').close()
-    for x in range(plaintext_num_of_blocks):
-        encrypt()
-        blocks_num += 1
-        new_key = 0
-
-#print(plaintext_num_of_blocks)
-
-#    generate_12_subkeys()
-#    print(current_used_keys)
-
-    read_ciphertext()
-    blocks_num = 0
-    open('decrypted_ciphertext.txt','w').close()
-    for y in range(plaintext_num_of_blocks):
-        decrypt()
-        blocks_num += 1
-    with open('decrypted_ciphertext.txt','r') as f:
-        dt = f.read()
-    print('Decrypted ciphertext: ', end="")
-    print(dt)
+    if(op is not None and op[1:3]=='ed'):
+        read_plaintext(plaintext_file)
+        open('ciphertext.txt','w').close()
+        for x in range(plaintext_num_of_blocks):
+            encrypt()
+            blocks_num += 1
+            new_key = 0
+        read_ciphertext()
+        blocks_num = 0
+        open('decrypted_ciphertext.txt','w').close()
+        for y in range(plaintext_num_of_blocks):
+            decrypt()
+            blocks_num += 1
+        with open('decrypted_ciphertext.txt','r') as f:
+            dt = f.read()
+        print('Decrypted ciphertext: ', end="")
+        print(dt)
+    elif op is not None and op[1:] == 'd':
+        generate_12_subkeys()
+        read_ciphertext()
+        blocks_num = 0
+        open('decrypted_ciphertext.txt','w').close()
+        for y in range(plaintext_num_of_blocks):
+            decrypt()
+            blocks_num += 1
+        with open('decrypted_ciphertext.txt','r') as f:
+            dt = f.read()
+        print('Decrypted ciphertext: ', end="")
+        print(dt)
+    elif op is not None and op[1:] == 'e':
+        read_plaintext(plaintext_file)
+        open('ciphertext.txt','w').close()
+        for x in range(plaintext_num_of_blocks):
+            encrypt()
+            blocks_num += 1
+            new_key = 0
 
 if __name__ == '__main__':
     main()
