@@ -479,11 +479,9 @@ def K(x):
     str = keys[new_key]
     new_key += 1
     if(int(z) == 0):
-        # print("K: " + str[-(a+2):])
         current_used_keys[round_num].append(str[-(a+2):])
         return str[-(a+2):]
     else:
-        # print("K: " + str[-(a+2):-a])
         current_used_keys[round_num].append(str[-(a+2):-a])
         return str[-(a+2):-a]
 
