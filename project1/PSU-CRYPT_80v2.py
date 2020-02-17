@@ -147,8 +147,6 @@ def read_hex_to_key(file='key.txt'):
         temp.clear()
     return key_str
 
-#read_hex_to_key()
-
 def encrypt():
     global round_num
     global ws
