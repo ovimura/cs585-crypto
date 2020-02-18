@@ -26,12 +26,13 @@ Steps to run the program:
 Commands:
 
 Files in the archive:
-    1. PSU-CRYPT.py
-    2. plaintext.txt
-    3. key.txt
-    4. ciphertext.txt
-    5. decrypted_ciphertext.txt
-    6. README
+    1. PSU-CRYPT.py - the implementation of the block-encryption algorithm PSU-CRYPT
+    2. plaintext.txt - the plaintext to be encrypted
+    3. key.txt - the 20 bit key used to encrypt/decrypt
+    4. ciphertext.txt - the ciphertext of the encrypted plaintext
+    5. decrypted_ciphertext.txt - the plaintext decrypted from the file ciphertext.txt
+    6. output.txt - the console output generated during the full execution of the program
+    7. README - summary of the implementation and usage instructions
 
 
 Submitting your solution
