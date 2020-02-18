@@ -1,0 +1,41 @@
+CS585, Project 1
+Student: Ovidiu Mura
+Email: mura@pdx.edu
+
+Submission Details:
+The PSU-CRYPT program is a block-encryption algorithm which uses 64 bit block size and 80 bit key.
+The algorithm is a combination of the Twofish and Skipjack. The first step in the encryption function
+is the whitening between plaintext and the key. Next, there are 20 rounds in which it computes F(R0, R1, round),
+then in the last round it undone the last swap. Lastly, the output is a result of the whitening the result of
+the rounds with the key. The decryption function performs the same operations except the rounds' keys
+are in reverse order. The key scheduler generates different subkeys on each round by left circular
+rotation of 1 bit and then store the new key to be used to encrypt.
+
+Steps to run the program:
+- unzip the compressed file
+- Navigate to the root directory
+- Place the change/update the plaintext.txt file with desired plaintext
+- Place the change/update the key.txt file with desired key
+- Run the following command: $> python3 PSU-CRYPT.py -ed plaintext.txt key.txt ciphertext.txt
+    - the encrypted data is stored in ciphertext.txt file
+    - the decrypted data from ciphertext file is stored in decrypted_ciphertext.txt file
+    -ed argument in the command line will encrypt the plaintext.txt data and store it to ciphertext.txt file
+    -e argument, will encrypt the data from plaintext.txt file and store it to ciphertext.txt file
+    -d argument, will decrypt data from ciphertext file and store it to decrypted_ciphertext.txt file
+
+Commands:
+
+Files in the archive:
+    1. PSU-CRYPT.py - the implementation of the block-encryption algorithm PSU-CRYPT
+    2. plaintext.txt - the plaintext to be encrypted
+    3. key.txt - the 20 bit key used to encrypt/decrypt
+    4. ciphertext.txt - the ciphertext of the encrypted plaintext
+    5. decrypted_ciphertext.txt - the plaintext decrypted from the file ciphertext.txt
+    6. output.txt - the console output generated during the full execution of the program
+    7. README - summary of the implementation and usage instructions
+
+Commands:
+>python3 PSU-CRYPT.py -ed plaintext.txt key.txt ciphertext.txt
+>python3 PSU-CRYPT.py -e plaintext.txt key.txt ciphertext.txt
+>python3 PSU-CRYPT.py -d plaintext.txt key.txt ciphertext.txt
+
