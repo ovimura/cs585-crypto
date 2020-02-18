@@ -1,6 +1,7 @@
 CS585, Project 1
 Student: Ovidiu Mura
 Email: mura@pdx.edu
+Due: Feb 19, 2020
 
 Submission Details:
 The PSU-CRYPT program is a block-encryption algorithm which uses 64 bit block size and 80 bit key.
@@ -34,15 +35,8 @@ Files in the archive:
     6. output.txt - the console output generated during the full execution of the program
     7. README - summary of the implementation and usage instructions
 
+Commands:
+>python3 PSU-CRYPT.py -ed plaintext.txt key.txt ciphertext.txt
+>python3 PSU-CRYPT.py -e plaintext.txt key.txt ciphertext.txt
+>python3 PSU-CRYPT.py -d plaintext.txt key.txt ciphertext.txt
 
-Submitting your solution
-Turn in electronically:
-All of your source code, documentation, etc. archived in a single compressed file. The compressed file name much include
-your last name. When you send in your code include the course number / project name in the subject line.
-Also include a text file named README that includes 
-1.Your name and an email address you can be contacted at.
-2.A brief description of what you are submitting.
-3.A precise description of how to build and use your program on the PSU system
-4.A list of files that should be in the archive, and a one line description of each file. 
-Make sure you thoroughly test your code. This project is due before class on the due date. 
-Submit this Project to me at bcsm@pdx.edu Demoing your solution, I will schedule short lab secessions for each of you to demo your code
