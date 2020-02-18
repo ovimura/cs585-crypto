@@ -42,12 +42,24 @@ ftable = [[0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3, 0x21,0x15,0x78,0x99,0xb
 [0x08,0x77,0x11,0xbe,0x92,0x4f,0x24,0xc5,0x32,0x36,0x9d,0xcf,0xf3,0xa6,0xbb,0xac],
 [0x5e,0x6c,0xa9,0x13,0x57,0x25,0xb5,0xe3,0xbd,0xa8,0x3a,0x01,0x05,0x59,0x2a,0x46]]
 
-INT_BITS = 80
+BITS = 80
 
 def left_rotate(n, d):
-    return (n << d)|(n >> (INT_BITS - d))
+    '''
+    It left rotate the bits, for the given positions.
+    :param n: the bits to be left rotated
+    :param d: the number of positions to be left rotated
+    :return: the new value after the left rotation is complete
+    '''
+    global BITS
+    return (n << d)|(n >> (BITS - d))
 
 def read_plaintext(file):
+    '''
+    It reads the plaintext from the given file and store it in memory. It appends '#' to fill multiple of 8 blocks
+    :param file: the file name of the stored plaintext to be read
+    :return: the string with the plaintext
+    '''
     global ws
     global plaintext_num_of_blocks
     with open(file) as f:
@@ -74,15 +86,20 @@ def read_plaintext(file):
     return s
 
 def read_ciphertext(file='ciphertext.txt'):
+    '''
+    It reads the ciphertext from the given file and store it in memory.
+    :param file: the file name of ciphertext
+    :return: ciphertext string
+    '''
     global cs
     global plaintext_num_of_blocks
     c_str = ''
     with open(file,'r') as f:
         data = f.read()
     if(data[:2] == '0x'):
-        c_str = data[2:] #-1]
+        c_str = data[2:]
     else:
-        c_str = data#[:-1]
+        c_str = data
     s = "".join("0x{:02x} ".format(ord(c)) for c in c_str)
     d = c_str.encode()[:-1] if len(c_str.encode()) % 16 != 0 else c_str.encode()
     plaintext_num_of_blocks = math.trunc(len(d)/16) + 0 if (len(d) % 16 == 0) else 1
@@ -93,14 +110,18 @@ def read_ciphertext(file='ciphertext.txt'):
         cs[idx] = []
         x = len(d) % 4 if(len(d)<i+x) else 4
         for j in range(i, i+x,2):
-            #print(d[j:j+2])
             temp.append(int(d[j:j+2],16))
         cs[idx] += (temp)
         idx += 1
         temp.clear()
     return s
 
-def read_key(file):
+def read_key(file='key.txt'):
+    '''
+    It reads the key from the given file.
+    :param file: the file name of key
+    :return: the key string
+    '''
     global key
     with open(file) as f:
         data = f.read()
@@ -123,6 +144,11 @@ def read_key(file):
     return data
 
 def read_hex_to_key(file='key.txt'):
+    '''
+    It reads the key from the given file name.
+    :param file: the filename of key
+    :return: the key string
+    '''
     global key
     global key_str
     with open(file) as f:
@@ -148,6 +174,10 @@ def read_hex_to_key(file='key.txt'):
     return key_str
 
 def encrypt():
+    '''
+    It encrypts the plaintext with the given key. The resulted ciphertext is stored in the ciphertext.txt file
+    :return: the ciphertext
+    '''
     global round_num
     global ws
     global key
@@ -236,6 +266,10 @@ def encrypt():
     return cipher
 
 def decrypt():
+    '''
+    It decrypts the ciphertext and the resulted plaintext is stored in the decrypted_ciphertext.txt file
+    :return: the plaintext
+    '''
     print('\nDECRYPTION\n')
     global round_num
     global ws
@@ -332,9 +366,16 @@ def decrypt():
     except:
         print("error: not able to write to file", end="")
         print(["{0:b}".format(ord(x)) for x in cc])
-    return cipher
+    return cc
 
 def F(R0, R1, round):
+    """
+    This is an invertible function similar to Feistel structure.
+    :param R0: w0 XOR K0 then computed R2 XOR F0
+    :param R1: w1 XOR K1 then computed R3 XOR F1
+    :param round: 20 rounds
+    :return: the values of F0, F1
+    """
     T0 = G(R0, round)
     T1 = G(R1, round)
     F0 = (int(T0,16) + 2*int(T1,16) +  int(K(4*round)+K(4*round+1), 16)) % 2**16
@@ -344,6 +385,10 @@ def F(R0, R1, round):
     return F0, F1
 
 def generate_12_subkeys():
+    """
+    It generates the 12 subkeys for each round in advanced
+    :return: None
+    """
     global round_num
     for r in range(20):
         current_used_keys[r] = []
@@ -362,6 +407,13 @@ def generate_12_subkeys():
         round_num += 1
 
 def F_decrypt(R0, R1, round):
+    """
+    It the decryption F function, similar to F function but rounds in reversed order.
+    :param R0: register 0
+    :param R1: register 1
+    :param round: round number
+    :return: values of F0 and F1
+    """
     T1 = G_decrypt(R1, round, 4)
     T0 = G_decrypt(R0, round, 0)
     F0 = (int(T0,16) + 2*int(T1,16) +  int(K_decrypt(round,8)+K_decrypt(round,9), 16)) % 2**16
@@ -372,6 +424,12 @@ def F_decrypt(R0, R1, round):
     return F0, F1
 
 def G(w, round):
+    """
+    It is using the 16 bits word and the round to compute the index of the substitution in ftable.
+    :param w: 16 bits word
+    :param round: round number
+    :return: g5 and g6
+    """
     g1 = w[0]
     g2 = w[1]
 
@@ -404,6 +462,13 @@ def G(w, round):
     return '{:02x}{:02x}'.format(g5,g6)
 
 def G_decrypt(w, round, v):
+    """
+    It is using the decrypt version of G function, 16 bits word and the round to compute the index of the substitution in ftable.
+    :param w: 16 bits word
+    :param round: round number
+    :param v: the index
+    :return: g5 and g6
+    """
     g1 = w[0]
     g2 = w[1]
 
@@ -435,6 +500,10 @@ def G_decrypt(w, round, v):
     return '{:02x}{:02x}'.format(g5,g6)
 
 def generate_subkeys():
+    """
+    It generates the subkeys.
+    :return: None
+    """
     global new_key
     global key
     global keys
@@ -468,6 +537,11 @@ def generate_subkeys():
         keys.append(s3)
 
 def K(x):
+    """
+    It computes the key for the corresponding round
+    :param x: the round value
+    :return: the key
+    """
     global new_key
     global key_str
     global current_used_keys
@@ -484,6 +558,12 @@ def K(x):
         return str[-(a+2):-a]
 
 def K_decrypt(r, z):
+    """
+    It returns the subkeys from memory.
+    :param r: row index
+    :param z: column index
+    :return: the subkey
+    """
     global current_used_keys
     return current_used_keys[r][z]
 
