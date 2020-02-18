@@ -1,0 +1,33 @@
+CS585, Project 1
+Student: Ovidiu Mura
+Email: mura@pdx.edu
+
+Submission Details:
+The PSU-CRYPT program is a block-encryption algorithm which uses 64 bit block size and 80 bit key.
+The algorithm is a combination of the Twofish and Skipjack. The first step in the encryption function
+is the whitening between plaintext and the key. Next, there are 20 rounds in which it computes F(R0, R1, round),
+then in the last round it undone the last swap. Lastly, the output is a result of the whitening the result of
+the rounds with the key. The decryption function performs the same operations except the rounds' keys
+are in reverse order. The key scheduler generates different subkeys on each round by left circular
+rotation of 1 bit and then store the new key to be used to encrypt.
+
+Steps to run the program:
+- unzip the compressed file
+- Navigate to the root directory
+- Run the following command: $> python3 PSU-CRYPT.py -ed plaintext.txt key.txt ciphertext.txt
+    - the encrypted data is stored in ciphertext.txt file
+    - the decrypted data from ciphertext file is stored in decrypted_ciphertext.txt file
+    -ed argument in the command line will encrypt the plaintext.txt data and store it to ciphertext.txt file
+    -e argument, will encrypt the data from plaintext.txt file and store it to ciphertext.txt file
+    -d argument, will decrypt data from ciphertext file and store it to decrypted_ciphertext.txt file
+
+Submitting your solution
+Turn in electronically:
+All of your source code, documentation, etc. archived in a single compressed file. The compressed file name much include your last name. When you send in your code include the course number / project name in the subject line. 
+Also include a text file named README that includes 
+1.Your name and an email address you can be contacted at.
+2.A brief description of what you are submitting.
+3.A precise description of how to build and use your program on the PSU system
+4.A list of files that should be in the archive, and a one line description of each file. 
+Make sure you thoroughly test your code. This project is due before class on the due date. 
+Submit this Project to me at bcsm@pdx.edu Demoing your solution, I will schedule short lab secessions for each of you to demo your code

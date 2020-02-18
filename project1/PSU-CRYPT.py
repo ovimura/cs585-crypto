@@ -1,13 +1,14 @@
 # CS585: Cryptography
 # Student: Ovidiu Mura
 # Assignment: Project 1
-# Date: Jan 20, 2020
+# Date: Feb 19, 2020
 
 import sys
 import math
 
 plaintext_file = None
 ciphertext_file = None
+decrypted_ciphertext = 'decrypted_ciphertext.txt'
 key_file = None
 
 bit_bock_size = 64
@@ -43,12 +44,8 @@ ftable = [[0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3, 0x21,0x15,0x78,0x99,0xb
 
 INT_BITS = 80
 
-def leftRotate(n, d):
+def left_rotate(n, d):
     return (n << d)|(n >> (INT_BITS - d))
-
-def print_input_file_names():
-    print("plaintext file name: {}".format(plaintext_file))
-    print("key file name: {}".format(key_file))
 
 def read_plaintext(file):
     global ws
@@ -57,7 +54,12 @@ def read_plaintext(file):
         data = f.read()
     s = "".join("0x{:02x} ".format(ord(c)) for c in data)
     d = data.encode()[:-1]
-    plaintext_num_of_blocks = math.trunc(len(d)/8) + 0 if (len(d) % 8 == 0) else 1
+    plaintext_num_of_blocks = math.trunc(len(d)/8) + (0 if (len(d) % 8 == 0) else 1)
+    x = 0
+    if (len(d) % 8) != 0:
+        x = 8 - (len(d) % 8)
+        y = "".join('#')*x
+        d = d + y.encode()
     x = 8
     idx = 0
     temp = []
@@ -69,7 +71,6 @@ def read_plaintext(file):
         ws[idx] += (temp)
         idx += 1
         temp.clear()
-    print(ws)
     return s
 
 def read_ciphertext(file='ciphertext.txt'):
@@ -121,7 +122,6 @@ def read_key(file):
     print("".join("0x{:02x} ".format(ord(x)) for x in data))
     return data
 
-# https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx
 def read_hex_to_key(file='key.txt'):
     global key
     global key_str
@@ -243,7 +243,7 @@ def decrypt():
     global key
     global current_used_keys
     global blocks_num
-    print(cs)
+    global decrypted_ciphertext
     temp = []
     ws = cs
     for i in range(4):
@@ -326,8 +326,12 @@ def decrypt():
         cc += chr(int('{:02x}'.format(c[n][1]),16))
     print("\nPlaintext HEX: 0x" + h)
     print("\nPlaintext ASCII: " + cc)
-    with open("decrypted_ciphertext.txt","+a") as f:
-        f.write(cc)
+    try:
+        with open(decrypted_ciphertext,"+a") as f:
+            f.write(cc)
+    except:
+        print("error: not able to write to file", end="")
+        print(["{0:b}".format(ord(x)) for x in cc])
     return cipher
 
 def F(R0, R1, round):
@@ -335,7 +339,6 @@ def F(R0, R1, round):
     T1 = G(R1, round)
     F0 = (int(T0,16) + 2*int(T1,16) +  int(K(4*round)+K(4*round+1), 16)) % 2**16
     F1 = (2*int(T0,16)+int(T1,16) + int(K(4*round+2)+K(4*round+3), 16)) % 2**16
-
     print('t0: {} t1: {}'.format(T0,T1))
     print('f0: {} f1: {}'.format(hex(F0),hex(F1)))
     return F0, F1
@@ -437,13 +440,13 @@ def generate_subkeys():
     global keys
     global key_str
 
-    result = leftRotate(int(key_str,16),1)
+    result = left_rotate(int(key_str,16),1)
     kk = '{0:x}'.format(int(bin(result)[-80:],2))
     keys.append(kk)
     j = 1
     for i in range(1,240):
         j = 1
-        result = leftRotate(int(keys[i-1],16),1)
+        result = left_rotate(int(keys[i-1],16),1)
         ss = '{0:b}'.format(result)
         ss = ss[-80:]
         s2 = ss
@@ -463,10 +466,7 @@ def generate_subkeys():
         else:
             s3 = s3
         keys.append(s3)
-    # for v in range(len(keys)):
-    #     print(keys[v])
 
-# https://stackoverflow.com/questions/46202913/python-cut-a-x-bit-binary-number-to-a-byte-8bit/46202957
 def K(x):
     global new_key
     global key_str
@@ -496,12 +496,14 @@ def main():
     global ws
     global blocks_num
     global new_key
+    global plaintext_num_of_blocks
+    global decrypted_ciphertext
     op = None
     if (len(sys.argv) != 5):
         print()
         print("error: incorrect number of arguments -> {}\n".format(len(sys.argv)))
         print("usage: [python | python3] PSU-CRYPT.py -<e|d> <plaintext.txt> <key.txt> <ciphertext.txt>")
-        print("       -<e|d>   e: encryption, d: decryption")
+        print("       -<e|d>   e: encryption, d: decryption, decrypt data from ciphertext.txt file and store it in decrypted_ciphertext.txt file")
         print("       <plaintext.txt>   the plaintext")
         print("       <key.txt>   the key")
         print("       <ciphertext.txt>   the ciphertext")
@@ -511,23 +513,22 @@ def main():
         plaintext_file = sys.argv[2]
         key_file = sys.argv[3]
         ciphertext_file = sys.argv[4]
-#        print_input_file_names()
     read_hex_to_key(key_file)
     generate_subkeys()
     if(op is not None and op[1:3]=='ed'):
         read_plaintext(plaintext_file)
-        open('ciphertext.txt','w').close()
+        open(ciphertext_file,'w').close()
         for x in range(plaintext_num_of_blocks):
             encrypt()
             blocks_num += 1
             new_key = 0
         read_ciphertext()
         blocks_num = 0
-        open('decrypted_ciphertext.txt','w').close()
+        open(decrypted_ciphertext,'w').close()
         for y in range(plaintext_num_of_blocks):
             decrypt()
             blocks_num += 1
-        with open('decrypted_ciphertext.txt','r') as f:
+        with open(decrypted_ciphertext,'r') as f:
             dt = f.read()
         print('Decrypted ciphertext: ', end="")
         print(dt)
@@ -535,17 +536,17 @@ def main():
         generate_12_subkeys()
         read_ciphertext()
         blocks_num = 0
-        open('decrypted_ciphertext.txt','w').close()
+        open(decrypted_ciphertext,'w').close()
         for y in range(plaintext_num_of_blocks):
             decrypt()
             blocks_num += 1
-        with open('decrypted_ciphertext.txt','r') as f:
+        with open(decrypted_ciphertext,'r') as f:
             dt = f.read()
         print('Decrypted ciphertext: ', end="")
         print(dt)
     elif op is not None and op[1:] == 'e':
         read_plaintext(plaintext_file)
-        open('ciphertext.txt','w').close()
+        open(ciphertext_file,'w').close()
         for x in range(plaintext_num_of_blocks):
             encrypt()
             blocks_num += 1
