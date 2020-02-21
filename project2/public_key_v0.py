@@ -3,16 +3,14 @@ import random
 p = 0
 g = 2
 e = 0
+
 d = 0
 
 pub_key = 'pubkey.txt'
 pri_key = 'prikey.txt'
 seed = ""
 
-plaintext_file = "ptext.txt"
-ciphertext_file = "ctext.txt"
-decrypted_ciphertext_file = "dtext.txt"
-
+_33bit = 8589934591
 
 # Utility function to do
 # modular exponentiation.
@@ -107,12 +105,20 @@ def gcd(a, b):
         a, b = b, a % b
     return a
 
-def setup():
+def main():
     global g
     global e
     global p
     global d
     global seed
+    d = 0
+    # print(gcd(6115255816,7439109323))
+    # exit(4)
+    # random.seed(ii)
+    # print(random.randint(1,ii))
+    # print(random.randint(1,ii))
+    # print(random.randint(1,ii))
+    # exit(9)
     print("\nChoose one of the following options: ")
     print("     1. - key generation")
     print("     2. - encryption")
@@ -121,84 +127,46 @@ def setup():
     while int(i) not in [1,2,3]:
         i = input("Enter one of the options [1,2,3]: ")
     if(int(i) == 1):
-        print("\nWelcome to Key Generation!\n")
+        print("Welcome to Key Generation!\n")
         seed = input("Enter a random number: ")
         while seed.isnumeric() is not True:
             seed = input("Enter a random number: ")
         random.seed(int(seed))
+    # print(random.randint(‭2147483648‬, 4294967295))
+    # max 32 bits: 4294967295
+    # min 32 bits: 2147483648
     while True:
         r = random.randint(178956970, 357913940)
+        #r = random.randint(32768, 65535)
         q = r*12 + 5
         while isPrime(q,15) is False:
             r = random.randint(178956970, 357913940)
             q = r*12 + 5
+        print(isPrime(q, 15))
+        print(q)
         p = 2*q + 1
+        #while isPrime(p,15) is False:
         if isPrime(p,15) is True:
             break
+            # r = random.randint(178956970, 357913940)
+            # print('r', end=":")
+            # print(r, end=" ")
+            # q = r*12 + 5
+            # print('q: ',end="")
+            # print(q,end='')
+            # p = 2*q + 1
+    print()
+    print(p)
     for _ in range(1,p-1):
         y = random.randint(1,p-2)
         x = gcd(y, p)
         if x == 1:
             d = y
             break
+    print('d',end='\n')
+    print(d)
     e = 2**d % p
-    t1 = "{} {} {}".format(p, g, e)
-    t2 = "{} {} {}".format(p, g, d)
-    tx1 = "p:{}, g:{}, e:{}".format(p, g, e)
-    tx2 = "p:{}, g:{}, d:{}".format(p, g, d)
-    print(tx1)
-    print(tx2)
-    with open(pub_key, "w+") as f1:
-        f1.write(t1)
-    with open(pri_key, "w+") as f2:
-        f2.write(t2)
-
-def encryption():
-    global p, g, d, e
-    global plaintext_file, ciphertext_file
-    dbits = {}
-    blocks = {}
-    with open(plaintext_file, "r") as f:
-        data = f.read()
-    b = ["{0:08b}".format(ord(x)) for x in data[:-1]]
-    bits = str(b).replace('[','').replace(']','').replace('\', \'','').replace('0b','').replace('\'','')
-    temp = bits
-    i = 0
-    for x in range(0, len(bits),32):
-        dbits[i] = temp[x:x+32]
-        i += 1
-    print(dbits)
-    #k = random.randint(0,p-1)
-    for z in range(len(dbits.keys())):
-        k = random.randint(0,1000)
-        print("k: {}".format(k))
-        C1 = g**k % p
-        C2 = ((e**k)*int(dbits[z],2)) % p
-        blocks[z] = [k, C1, C2]
-
-    print(blocks)
-    cc = ""
-    with open(ciphertext_file, 'w+') as f:
-        for i in range(len(blocks.keys())):
-            cc += "{} {} ".format(blocks[i][1],blocks[i][2])
-        f.write(cc)
-
-def decryption():
-    global p, g, d, e
-    global plaintext_file, ciphertext_file
-    pass
-
-
-
-def main():
-    global p, g, d, e
-    global plaintext_file, ciphertext_file
-    # with open(plaintext_file, 'r') as f:
-    #     rr = f.read()
-    # print(len(rr))
-    # exit(3)
-    setup()
-    encryption()
+    print(e)
 
 if __name__ == "__main__":
     main()
