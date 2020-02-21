@@ -145,6 +145,12 @@ def main():
     print(d)
     e = 2**d % p
     print(e)
+    t1 = "{} {} {}".format(p, g, e)
+    t2 = "{} {} {}".format(p, g, d)
+    with open(pub_key, "w+") as f1:
+        f1.write(t1)
+    with open(pri_key, "w+") as f2:
+        f2.write(t2)
 
 if __name__ == "__main__":
     main()
