@@ -13,6 +13,18 @@ plaintext_file = "ptext.txt"
 ciphertext_file = "ctext.txt"
 decrypted_ciphertext_file = "dtext.txt"
 
+def exp_func(x, y):
+    exp = bin(y)
+    value = x
+
+    for i in range(3, len(exp)):
+        value = value * value
+        if(exp[i:i+1]=='1'):
+            value = value*x
+    return value
+
+# print(exp_func(2,4810291259))
+# exit(3)
 
 # Utility function to do
 # modular exponentiation.
@@ -141,7 +153,8 @@ def setup():
         if x == 1:
             d = y
             break
-    e = 2**d % p
+    #e = 2**d % p
+    e = exp_func(2,d) % p
     t1 = "{} {} {}".format(p, g, e)
     t2 = "{} {} {}".format(p, g, d)
     tx1 = "p:{}, g:{}, e:{}".format(p, g, e)
@@ -168,12 +181,14 @@ def encryption():
         dbits[i] = temp[x:x+32]
         i += 1
     print(dbits)
-    #k = random.randint(0,p-1)
+    # k = random.randint(0,p-1)
     for z in range(len(dbits.keys())):
-        k = random.randint(0,1000)
+        k = random.randint(0,p-1)
         print("k: {}".format(k))
-        C1 = g**k % p
-        C2 = ((e**k)*int(dbits[z],2)) % p
+        #C1 = g**k % p
+        #C2 = ((e**k)*int(dbits[z],2)) % p
+        C1 = exp_func(g,k) % p
+        C2 = (exp_func(e,k)*int(dbits[z],2)) % p
         blocks[z] = [k, C1, C2]
 
     print(blocks)
@@ -185,10 +200,29 @@ def encryption():
 
 def decryption():
     global p, g, d, e
-    global plaintext_file, ciphertext_file
+    global plaintext_file, ciphertext_file, pri_key, pub_key
+    print('decryption')
+    with open(pri_key, "r") as f:
+        data = f.read()
+    p = data[:-1].split(" ")[0]
+    g = data[:-1].split(" ")[1]
+    d = data[:-1].split(" ")[2]
+    with open(pub_key, "r") as f:
+        data = f.read()
+    e = data[:-1].split(" ")[2]
+    print(p)
+    print(g)
+    print(d)
+    print(e)
+    with open(ciphertext_file, "r") as f:
+        data = f.read()
+    C1 = data[:-1].split(" ")[0]
+    C2 = data[:-1].split(" ")[1]
+    c1 = ((int(C1)**(int(p)-1-int(d))) % int(p))
+    c2 = (int(C2) % int(p))
+    m = (c1*c2) % int(p)
+    print(m)
     pass
-
-
 
 def main():
     global p, g, d, e
@@ -199,6 +233,7 @@ def main():
     # exit(3)
     setup()
     encryption()
+    #decryption()
 
 if __name__ == "__main__":
     main()
