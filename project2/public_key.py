@@ -218,7 +218,9 @@ def decryption():
         data = f.read()
     C1 = data[:-1].split(" ")[0]
     C2 = data[:-1].split(" ")[1]
-    c1 = ((int(C1)**(int(p)-1-int(d))) % int(p))
+    # c1 = ((int(C1)**(int(p)-1-int(d))) % int(p))
+    # c2 = (int(C2) % int(p))
+    c1 = exp_func(int(C1),(int(p)-1-int(d))) % int(p)
     c2 = (int(C2) % int(p))
     m = (c1*c2) % int(p)
     print(m)
