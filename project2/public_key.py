@@ -3,14 +3,14 @@ import random
 p = 0
 g = 2
 e = 0
-
 d = 0
 
 pub_key = 'pubkey.txt'
 pri_key = 'prikey.txt'
 seed = ""
 
-_33bit = 8589934591
+plaintext_file = "ptext.txt"
+ciphertext_file = "ctext.txt"
 
 # Utility function to do
 # modular exponentiation.
@@ -105,7 +105,7 @@ def gcd(a, b):
         a, b = b, a % b
     return a
 
-def main():
+def setup():
     global g
     global e
     global p
@@ -119,7 +119,7 @@ def main():
     while int(i) not in [1,2,3]:
         i = input("Enter one of the options [1,2,3]: ")
     if(int(i) == 1):
-        print("Welcome to Key Generation!\n")
+        print("\nWelcome to Key Generation!\n")
         seed = input("Enter a random number: ")
         while seed.isnumeric() is not True:
             seed = input("Enter a random number: ")
@@ -133,24 +133,54 @@ def main():
         p = 2*q + 1
         if isPrime(p,15) is True:
             break
-    print()
-    print(p)
     for _ in range(1,p-1):
         y = random.randint(1,p-2)
         x = gcd(y, p)
         if x == 1:
             d = y
             break
-    print('d',end='\n')
-    print(d)
     e = 2**d % p
-    print(e)
     t1 = "{} {} {}".format(p, g, e)
     t2 = "{} {} {}".format(p, g, d)
+    tx1 = "p:{}, g:{}, e:{}".format(p, g, e)
+    tx2 = "p:{}, g:{}, d:{}".format(p, g, d)
+    print(tx1)
+    print(tx2)
     with open(pub_key, "w+") as f1:
         f1.write(t1)
     with open(pri_key, "w+") as f2:
         f2.write(t2)
+
+def encryption():
+    global p, g, d, e
+    global plaintext_file, ciphertext_file
+    c = 0
+    with open(plaintext_file, "r") as f:
+        data = f.read()
+    b = ["{0:08b}".format(ord(x)) for x in data[:-1]]
+    bits = str(b).replace('[','').replace(']','').replace('\', \'','').replace('0b','').replace('\'','')
+    temp = bits
+    dbits = {}
+    i = 0
+    for x in range(0, len(bits),32):
+        dbits[i] = temp[x:x+32]
+        i += 1
+    print(dbits)
+    k = random.randint(0,p-1)
+    print("k: {}".format(k))
+    C1 = g**k % p
+    C2 = ((e**k)*int(dbits[0],2)) % p
+    print(C1, C2)
+
+def main():
+    global p, g, d, e
+    global plaintext_file, ciphertext_file
+    # with open(plaintext_file, 'r') as f:
+    #     rr = f.read()
+    # print(len(rr))
+    # exit(3)
+    setup()
+    encryption()
 
 if __name__ == "__main__":
     main()
