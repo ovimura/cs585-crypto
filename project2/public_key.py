@@ -23,6 +23,23 @@ def exp_func(x, y):
             value = value*x
     return value
 
+N = 0
+
+def exponentiation(bas, exp):
+    global N
+    t = 1
+    while(exp > 0):
+
+        # for cases where exponent
+        # is not an even value
+        if (exp % 2 != 0):
+            t = (t * bas) % N
+
+        bas = (bas * bas) % N
+        exp = int(exp / 2)
+    return t % N
+
+
 # print(exp_func(2,4810291259))
 # exit(3)
 
@@ -199,7 +216,7 @@ def encryption():
         f.write(cc)
 
 def decryption():
-    global p, g, d, e
+    global p, g, d, e, N
     global plaintext_file, ciphertext_file, pri_key, pub_key
     print('decryption')
     with open(pri_key, "r") as f:
@@ -214,13 +231,15 @@ def decryption():
     print(g)
     print(d)
     print(e)
+    N = int(p)
     with open(ciphertext_file, "r") as f:
         data = f.read()
     C1 = data[:-1].split(" ")[0]
     C2 = data[:-1].split(" ")[1]
     # c1 = ((int(C1)**(int(p)-1-int(d))) % int(p))
     # c2 = (int(C2) % int(p))
-    c1 = exp_func(int(C1),(int(p)-1-int(d))) % int(p)
+    #c1 = exp_func(int(C1),(int(p)-1-int(d))) % int(p)
+    c1 = exponentiation(int(C1),(int(p)-1-int(d))) % int(p)
     c2 = (int(C2) % int(p))
     m = (c1*c2) % int(p)
     print(m)
