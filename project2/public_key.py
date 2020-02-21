@@ -40,6 +40,20 @@ def exponentiation(bas, exp):
     return t % N
 
 
+
+def modexp_rl(a, b, n):
+    r = 1
+    while 1:
+        if b % 2 == 1:
+            r = r * a % n
+        b /= 2
+        if b == 0:
+            break
+        a = a * a % n
+
+    return r
+
+
 # print(exp_func(2,4810291259))
 # exit(3)
 
@@ -164,14 +178,26 @@ def setup():
         p = 2*q + 1
         if isPrime(p,15) is True:
             break
-    for _ in range(1,p-1):
-        y = random.randint(1,p-2)
+    print("p: {}, q: {}".format(p,q))
+
+    for _ in range(1,p):
+        y = random.randint(1,p-1)
         x = gcd(y, p)
         if x == 1:
             d = y
             break
-    #e = 2**d % p
-    e = exp_func(2,d) % p
+    print("d: {}".format(d))
+    global N
+    N = p
+#    e1 = exp_func(2,d) % p
+#    e = modexp_rl(2, d, p)
+    e = exponentiation(2, d)
+#    e0 = 2**d % p
+    print(e)
+    # print(e1)
+    # print(e0)
+    # print(e2)
+
     t1 = "{} {} {}".format(p, g, e)
     t2 = "{} {} {}".format(p, g, d)
     tx1 = "p:{}, g:{}, e:{}".format(p, g, e)
@@ -216,29 +242,30 @@ def encryption():
         f.write(cc)
 
 def decryption():
-    global p, g, d, e, N
+    global p, g, d, e
     global plaintext_file, ciphertext_file, pri_key, pub_key
     print('decryption')
     with open(pri_key, "r") as f:
         data = f.read()
-    p = data[:-1].split(" ")[0]
-    g = data[:-1].split(" ")[1]
-    d = data[:-1].split(" ")[2]
+    p = data.split(" ")[0]
+    g = data.split(" ")[1]
+    d = data.split(" ")[2]
     with open(pub_key, "r") as f:
         data = f.read()
-    e = data[:-1].split(" ")[2]
-    print(p)
-    print(g)
-    print(d)
-    print(e)
-    N = int(p)
+    e = data.split(" ")[2]
+    print("p: {}".format(p))
+    print("g: {}".format(g))
+    print("d: {}".format(d))
+    print("e: {}".format(e))
+    #exit(3)
     with open(ciphertext_file, "r") as f:
         data = f.read()
-    C1 = data[:-1].split(" ")[0]
-    C2 = data[:-1].split(" ")[1]
-    # c1 = ((int(C1)**(int(p)-1-int(d))) % int(p))
-    # c2 = (int(C2) % int(p))
-    #c1 = exp_func(int(C1),(int(p)-1-int(d))) % int(p)
+    C1 = data.split(" ")[0]
+    C2 = data.split(" ")[1]
+    print('C111111')
+    print(C1)
+    print(C2)
+    print('C222222')
     c1 = exponentiation(int(C1),(int(p)-1-int(d))) % int(p)
     c2 = (int(C2) % int(p))
     m = (c1*c2) % int(p)
