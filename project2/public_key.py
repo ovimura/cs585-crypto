@@ -39,24 +39,6 @@ def exponentiation(bas, exp):
         exp = int(exp / 2)
     return t % N
 
-
-
-def modexp_rl(a, b, n):
-    r = 1
-    while 1:
-        if b % 2 == 1:
-            r = r * a % n
-        b /= 2
-        if b == 0:
-            break
-        a = a * a % n
-
-    return r
-
-
-# print(exp_func(2,4810291259))
-# exit(3)
-
 # Utility function to do
 # modular exponentiation.
 # It returns (x^y) % p
@@ -186,18 +168,9 @@ def setup():
         if x == 1:
             d = y
             break
-    print("d: {}".format(d))
     global N
     N = p
-#    e1 = exp_func(2,d) % p
-#    e = modexp_rl(2, d, p)
     e = exponentiation(2, d)
-#    e0 = 2**d % p
-    print(e)
-    # print(e1)
-    # print(e0)
-    # print(e2)
-
     t1 = "{} {} {}".format(p, g, e)
     t2 = "{} {} {}".format(p, g, d)
     tx1 = "p:{}, g:{}, e:{}".format(p, g, e)
@@ -210,7 +183,7 @@ def setup():
         f2.write(t2)
 
 def encryption():
-    global p, g, d, e
+    global p, g, d, e, N
     global plaintext_file, ciphertext_file
     dbits = {}
     blocks = {}
@@ -224,14 +197,17 @@ def encryption():
         dbits[i] = temp[x:x+32]
         i += 1
     print(dbits)
+    N = p
     # k = random.randint(0,p-1)
     for z in range(len(dbits.keys())):
         k = random.randint(1,10000)
         print("k: {}".format(k))
         #C1 = g**k % p
         #C2 = ((e**k)*int(dbits[z],2)) % p
-        C1 = exp_func(g,k) % p
-        C2 = (exp_func(e,k)*int(dbits[z],2)) % p
+        #C1 = exp_func(g,k) % p
+        #C2 = (exp_func(e,k)*int(dbits[z],2)) % p
+        C1 = exponentiation(g,k) % p
+        C2 = (exponentiation(e,k)*int(dbits[z],2)) % p
         blocks[z] = [k, C1, C2]
 
     print(blocks)
@@ -262,13 +238,11 @@ def decryption():
         data = f.read()
     C1 = data.split(" ")[0]
     C2 = data.split(" ")[1]
-    print('C111111')
-    print(C1)
-    print(C2)
-    print('C222222')
     c1 = exponentiation(int(C1),(int(p)-1-int(d))) % int(p)
     c2 = (int(C2) % int(p))
     m = (c1*c2) % int(p)
+    with open(decrypted_ciphertext_file, "w+") as f:
+        f.write(str(m))
     print(m)
 
 def main():
