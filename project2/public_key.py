@@ -183,7 +183,7 @@ def encryption():
     print(dbits)
     # k = random.randint(0,p-1)
     for z in range(len(dbits.keys())):
-        k = random.randint(0,p-1)
+        k = random.randint(1,10000)
         print("k: {}".format(k))
         #C1 = g**k % p
         #C2 = ((e**k)*int(dbits[z],2)) % p
@@ -222,7 +222,6 @@ def decryption():
     c2 = (int(C2) % int(p))
     m = (c1*c2) % int(p)
     print(m)
-    pass
 
 def main():
     global p, g, d, e
@@ -233,7 +232,7 @@ def main():
     # exit(3)
     setup()
     encryption()
-    #decryption()
+    decryption()
 
 if __name__ == "__main__":
     main()
