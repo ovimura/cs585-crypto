@@ -230,8 +230,6 @@ def decryption():
     with open(ciphertext_file, "r") as f:
         data = f.read()
     temp = data[:-1].split(" ")
-    print(len(temp))
-    print(temp)
     ms = []
     for u in range(0, len(temp), 2):
         C1 = data.split(" ")[u]
@@ -240,8 +238,7 @@ def decryption():
         c2 = (int(C2) % int(p))
         m = (c1*c2) % int(p)
         ms.append(m)
-    with open(decrypted_ciphertext_file, "w+") as f:
-        f.write(str(ms))
+    print("\nblocks: ", end="")
     print(ms)
     txt = ""
     for u in range(len(ms)):
@@ -250,7 +247,10 @@ def decryption():
             b = bys[i:i+8]
             txt += chr(int(b,2))
             # print(chr(int(b,2)))
+    print("Decrypted Ciphertext: ", end="")
     print(txt)
+    with open(decrypted_ciphertext_file, "w+") as f:
+        f.write(txt)
 
 
 def main():
