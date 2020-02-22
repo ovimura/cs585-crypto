@@ -196,6 +196,7 @@ def encryption():
     for x in range(0, len(bits),32):
         dbits[i] = temp[x:x+32]
         i += 1
+    print("\nPlaintext in Bytes, 32-bits blocks:")
     print(dbits)
     N = p
     # k = random.randint(0,p-1)
@@ -204,6 +205,7 @@ def encryption():
         C1 = exponentiation(g,k) % p
         C2 = (exponentiation(e,k)*int(dbits[z],2)) % p
         blocks[z] = [k, C1, C2]
+    print("\nCiphertext, key + block pairs: (k, C1, C2):")
     print(blocks)
     cc = ""
     with open(ciphertext_file, 'w+') as f:
@@ -238,12 +240,12 @@ def decryption():
         c2 = (int(C2) % int(p))
         m = (c1*c2) % int(p)
         ms.append(m)
-    print("\nblocks: ", end="")
+    print("\nDecrypted blocks: ", end="")
     print(ms)
     txt = ""
     for u in range(len(ms)):
         bys = "{:032b}".format(int(ms[u]))
-        print(bys)
+        # print(bys)
         for i in range(0,32,8):
             b = bys[i:i+8]
             if(int(b,2) != 0):
