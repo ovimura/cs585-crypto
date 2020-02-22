@@ -243,10 +243,12 @@ def decryption():
     txt = ""
     for u in range(len(ms)):
         bys = "{:032b}".format(int(ms[u]))
+        print(bys)
         for i in range(0,32,8):
             b = bys[i:i+8]
-            txt += chr(int(b,2))
-            # print(chr(int(b,2)))
+            if(int(b,2) != 0):
+                txt += chr(int(b,2))
+            #print(chr(int(b,2)))
     print("Decrypted Ciphertext: ", end="")
     print(txt)
     with open(decrypted_ciphertext_file, "w+") as f:
