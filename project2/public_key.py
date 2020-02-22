@@ -201,15 +201,9 @@ def encryption():
     # k = random.randint(0,p-1)
     for z in range(len(dbits.keys())):
         k = random.randint(1,10000)
-        print("k: {}".format(k))
-        #C1 = g**k % p
-        #C2 = ((e**k)*int(dbits[z],2)) % p
-        #C1 = exp_func(g,k) % p
-        #C2 = (exp_func(e,k)*int(dbits[z],2)) % p
         C1 = exponentiation(g,k) % p
         C2 = (exponentiation(e,k)*int(dbits[z],2)) % p
         blocks[z] = [k, C1, C2]
-
     print(blocks)
     cc = ""
     with open(ciphertext_file, 'w+') as f:
@@ -220,7 +214,7 @@ def encryption():
 def decryption():
     global p, g, d, e
     global plaintext_file, ciphertext_file, pri_key, pub_key
-    print('decryption')
+    print()
     with open(pri_key, "r") as f:
         data = f.read()
     p = data.split(" ")[0]
@@ -233,25 +227,35 @@ def decryption():
     print("g: {}".format(g))
     print("d: {}".format(d))
     print("e: {}".format(e))
-    #exit(3)
     with open(ciphertext_file, "r") as f:
         data = f.read()
-    C1 = data.split(" ")[0]
-    C2 = data.split(" ")[1]
-    c1 = exponentiation(int(C1),(int(p)-1-int(d))) % int(p)
-    c2 = (int(C2) % int(p))
-    m = (c1*c2) % int(p)
+    temp = data[:-1].split(" ")
+    print(len(temp))
+    print(temp)
+    ms = []
+    for u in range(0, len(temp), 2):
+        C1 = data.split(" ")[u]
+        C2 = data.split(" ")[u+1]
+        c1 = exponentiation(int(C1),(int(p)-1-int(d))) % int(p)
+        c2 = (int(C2) % int(p))
+        m = (c1*c2) % int(p)
+        ms.append(m)
     with open(decrypted_ciphertext_file, "w+") as f:
-        f.write(str(m))
-    print(m)
+        f.write(str(ms))
+    print(ms)
+    txt = ""
+    for u in range(len(ms)):
+        bys = "{:032b}".format(int(ms[u]))
+        for i in range(0,32,8):
+            b = bys[i:i+8]
+            txt += chr(int(b,2))
+            # print(chr(int(b,2)))
+    print(txt)
+
 
 def main():
     global p, g, d, e
     global plaintext_file, ciphertext_file
-    # with open(plaintext_file, 'r') as f:
-    #     rr = f.read()
-    # print(len(rr))
-    # exit(3)
     setup()
     encryption()
     decryption()
