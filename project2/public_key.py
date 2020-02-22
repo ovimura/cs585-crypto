@@ -1,3 +1,8 @@
+# CS585: Project 2
+# Student: Ovidiu Mura
+# Due: March 4, 2020
+# Reference: https://www.geeksforgeeks.org/exponential-squaring-fast-modulo-multiplication/
+
 import random
 
 p = 0
