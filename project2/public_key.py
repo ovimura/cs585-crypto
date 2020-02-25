@@ -143,19 +143,7 @@ def setup():
     global p
     global d
     global seed
-    print("\nChoose one of the following options: ")
-    print("     1. - key generation")
-    print("     2. - encryption")
-    print("     3. - decryption")
-    i = input("Enter your value: ")
-    while int(i) not in [1,2,3]:
-        i = input("Enter one of the options [1,2,3]: ")
-    if(int(i) == 1):
-        print("\nWelcome to Key Generation!\n")
-        seed = input("Enter a random number: ")
-        while seed.isnumeric() is not True:
-            seed = input("Enter a random number: ")
-        random.seed(int(seed))
+    global N
     while True:
         r = random.randint(178956970, 357913940)
         q = r*12 + 5
@@ -173,7 +161,6 @@ def setup():
         if x == 1:
             d = y
             break
-    global N
     N = p
     e = exponentiation(2, d)
     t1 = "{} {} {}".format(p, g, e)
@@ -186,6 +173,26 @@ def setup():
         f1.write(t1)
     with open(pri_key, "w+") as f2:
         f2.write(t2)
+
+def read_keys():
+    global pub_key, pri_key
+    global p, g, d, e, N
+    with open(pri_key) as f:
+        data = f.read()
+    data = data.split(" ")
+    p = int(data[0])
+    g = int(data[1])
+    d = int(data[2])
+    print(p)
+    print(g)
+    print(d)
+    with open(pub_key) as f:
+        data = f.read()
+    data = data.split(" ")
+    e = int(data[2])
+    print(e)
+    #exit(3)
+    N = p
 
 def encryption():
     global p, g, d, e, N
@@ -203,6 +210,7 @@ def encryption():
         i += 1
     print("\nPlaintext in Bytes, 32-bits blocks:")
     print(dbits)
+    random.seed(1)
     N = p
     # k = random.randint(0,p-1)
     for z in range(len(dbits.keys())):
@@ -265,9 +273,29 @@ def decryption():
 def main():
     global p, g, d, e
     global plaintext_file, ciphertext_file
-    setup()
-    encryption()
-    decryption()
+    global seed
+    print("\nChoose one of the following options: ")
+    print("     1. - key generation")
+    print("     2. - encryption")
+    print("     3. - decryption")
+    i = input("Enter your value: ")
+    while int(i) not in [1,2,3]:
+        i = input("Enter one of the options [1,2,3]: ")
+    if(int(i) == 1):
+        print("\nWelcome to Key Generation!\n")
+        seed = input("Enter a random number: ")
+        while seed.isnumeric() is not True:
+            seed = input("Enter a random number: ")
+        random.seed(int(seed))
+        setup()
+        encryption()
+        decryption()
+    elif int(i) == 2:
+        read_keys()
+        encryption()
+    elif int(i) == 3:
+        read_keys()
+        decryption()
 
 if __name__ == "__main__":
     main()
