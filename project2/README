@@ -1,0 +1,32 @@
+CS585: Cryptography
+Assignment: Project 2
+Student: Ovidiu Mura
+Email: mura@pdx.edu
+
+2. A brief description of what you are submitting.
+
+
+
+
+3. A precise description of how to build and use your program.
+
+Run the following command to execute the program:
+    python3 public_key.py
+
+    Choose 1, 2, or 3
+        1 - to run key generator
+        2 - to run encryption (assuming the key generator run before least once)
+        3 - to run decryption (assuming the key generator and encryption run before least once)
+
+
+
+
+4. A list of files that should be in the archive, and a one-line description of each file.
+
+    ctext.txt   ciphertext file
+    dtext.txt   decrypted ciphertext from ctext.txt file
+    ptext.txt   the plaintext file
+    prikey.txt  the private key file
+    pubkey.txt  the public key file
+    public_key.py   the implementation of the public key file
+    README  an overview of the functionality and content of the project 2
