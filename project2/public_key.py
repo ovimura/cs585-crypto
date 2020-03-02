@@ -1,7 +1,6 @@
 # CS585: Project 2
 # Student: Ovidiu Mura
 # Due: March 4, 2020
-# Reference: https://www.geeksforgeeks.org/exponential-squaring-fast-modulo-multiplication/
 
 import random
 
@@ -9,6 +8,8 @@ p = 0
 g = 2
 e = 0
 d = 0
+
+N = 0
 
 pub_key = 'pubkey.txt'
 pri_key = 'prikey.txt'
@@ -18,9 +19,15 @@ plaintext_file = "ptext.txt"
 ciphertext_file = "ctext.txt"
 decrypted_ciphertext_file = "dtext.txt"
 
-N = 0
 
 def exponentiation_modulo(b, e):
+    """
+    It perform exponentiation and apply modulo N for each multiplication step.
+    Reference: https://www.geeksforgeeks.org/exponential-squaring-fast-modulo-multiplication/
+    :param b: base
+    :param e: exponent
+    :return: result
+    """
     global N
     t = 1
     while(e > 0):
@@ -30,85 +37,85 @@ def exponentiation_modulo(b, e):
         e = int(e / 2)
     return t % N
 
-# Utility function to do
-# modular exponentiation.
-# It returns (x^y) % p
 def power(x, y, p):
-    # Initialize result
+    """
+    Utility function to do modular exponention.
+    :param x: base
+    :param y: exponent
+    :param p: modulo
+    :return:
+    """
     res = 1
-    # Update x if it is more than or
-    # equal to p
     x = x % p
     while (y > 0):
-        # If y is odd, multiply
-        # x with result
         if (y & 1):
             res = (res * x) % p
-        # y must be even now
-        y = y>>1 # y = y/2
+        y = y>>1
         x = (x * x) % p
     return res
 
-# This function is called
-# for all k trials. It returns
-# false if n is composite and
-# returns false if n is
-# probably prime. d is an odd
-# number such that d*2<sup>r</sup> = n-1
-# for some r >= 1
-def miillerTest(d, n):
-    # Pick a random number in [2..n-2]
-    # Corner cases make sure that n > 4
+
+def millerTest(d, n):
+    """
+     This function is called
+     for all k trials. It returns
+     false if n is composite and
+     returns true if n is probably prime.
+     Reference: https://www.geeksforgeeks.org/primality-test-set-3-miller-rabin
+    :param d: odd number such that d*2^r = n-1
+    :param n:
+    :return: True if n is probably prime, and False if n is composite
+    """
     a = 2 + random.randint(1, n - 4)
-    # Compute a^d % n
     x = power(a, d, n)
-    if (x == 1 or x == n - 1):
+    if x == 1 or x == n - 1:
         return True
-    # Keep squaring x while one
-    # of the following doesn't
-    # happen
-    # (i) d does not reach n-1
-    # (ii) (x^2) % n is not 1
-    # (iii) (x^2) % n is not n-1
-    while (d != n - 1):
+    while d != n - 1:
         x = (x * x) % n
         d *= 2
-        if (x == 1):
+        if x == 1:
             return False
-        if (x == n - 1):
+        if x == n - 1:
             return True
-    # Return composite
     return False
 
-# It returns false if n is
-# composite and returns true if n
-# is probably prime. k is an
-# input parameter that determines
-# accuracy level. Higher value of
-# k indicates more accuracy.
 def isPrime( n, k):
-    # Corner cases
-    if (n <= 1 or n == 4):
+    """
+     It returns false if n is
+     composite and returns true if n
+     is probably prime.
+    :param n: the integer to be tested
+    :param k: accuracy level, higher value of k more accuracy
+    :return: True if the integer is prime, False otherwise.
+    """
+    if n <= 1 or n == 4:
         return False
-    if (n <= 3):
+    if n <= 3:
         return True
-    # Find r such that n =
-    # 2^d * r + 1 for some r >= 1
     d = n - 1
     while (d % 2 == 0):
         d //= 2
-    # Iterate given nber of 'k' times
     for i in range(k):
-        if (miillerTest(d, n) == False):
+        if millerTest(d, n) == False:
             return False
     return True
 
 def gcd(a, b):
+    """
+    It calculates gcd - greatest common denominator.
+    :param a: first integer
+    :param b: second integer
+    :return: gcd result
+    """
     while b:
         a, b = b, a % b
     return a
 
 def setup():
+    """
+    It setup the values for public key and private key.
+    :return:
+    """
     global g
     global e
     global p
@@ -146,6 +153,10 @@ def setup():
         f2.write(t2)
 
 def read_keys():
+    """
+    It reads the keys from the files.
+    :return:
+    """
     global pub_key, pri_key
     global p, g, d, e, N
     with open(pri_key) as f:
@@ -162,10 +173,13 @@ def read_keys():
     data = data.split(" ")
     e = int(data[2])
     print(e)
-    #exit(3)
     N = p
 
 def encryption():
+    """
+    It encrypts the plaintext from ptext.txt file with the public key from pubkey.txt file.
+    :return:
+    """
     global p, g, d, e, N
     global plaintext_file, ciphertext_file
     dbits = {}
@@ -183,7 +197,6 @@ def encryption():
     print(dbits)
     random.seed(1)
     N = p
-    # k = random.randint(0,p-1)
     for z in range(len(dbits.keys())):
         k = random.randint(1,10000)
         C1 = exponentiation_modulo(g,k) % p
@@ -198,6 +211,10 @@ def encryption():
         f.write(cc)
 
 def decryption():
+    """
+    It decrypts the ciphertext from the ctext.txt file and stores the plaintext into the dtext.txt file.
+    :return:
+    """
     global p, g, d, e
     global plaintext_file, ciphertext_file, pri_key, pub_key
     print()
@@ -229,12 +246,10 @@ def decryption():
     txt = ""
     for u in range(len(ms)):
         bys = "{:032b}".format(int(ms[u]))
-        # print(bys)
         for i in range(0,32,8):
             b = bys[i:i+8]
             if(int(b,2) != 0):
                 txt += chr(int(b,2))
-            #print(chr(int(b,2)))
     print("Decrypted Ciphertext: ", end="")
     print(txt)
     with open(decrypted_ciphertext_file, "w+") as f:
