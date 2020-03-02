@@ -18,54 +18,35 @@ plaintext_file = "ptext.txt"
 ciphertext_file = "ctext.txt"
 decrypted_ciphertext_file = "dtext.txt"
 
-def exp_func(x, y):
-    exp = bin(y)
-    value = x
-
-    for i in range(3, len(exp)):
-        value = value * value
-        if(exp[i:i+1]=='1'):
-            value = value*x
-    return value
-
 N = 0
 
-def exponentiation(bas, exp):
+def exponentiation_modulo(b, e):
     global N
     t = 1
-    while(exp > 0):
-
-        # for cases where exponent
-        # is not an even value
-        if (exp % 2 != 0):
-            t = (t * bas) % N
-
-        bas = (bas * bas) % N
-        exp = int(exp / 2)
+    while(e > 0):
+        if (e % 2 != 0):
+            t = (t * b) % N
+        b = (b * b) % N
+        e = int(e / 2)
     return t % N
 
 # Utility function to do
 # modular exponentiation.
 # It returns (x^y) % p
 def power(x, y, p):
-
     # Initialize result
     res = 1
-
     # Update x if it is more than or
     # equal to p
     x = x % p
     while (y > 0):
-
         # If y is odd, multiply
         # x with result
         if (y & 1):
             res = (res * x) % p
-
         # y must be even now
         y = y>>1 # y = y/2
         x = (x * x) % p
-
     return res
 
 # This function is called
@@ -76,17 +57,13 @@ def power(x, y, p):
 # number such that d*2<sup>r</sup> = n-1
 # for some r >= 1
 def miillerTest(d, n):
-
     # Pick a random number in [2..n-2]
     # Corner cases make sure that n > 4
     a = 2 + random.randint(1, n - 4)
-
     # Compute a^d % n
     x = power(a, d, n)
-
     if (x == 1 or x == n - 1):
         return True
-
     # Keep squaring x while one
     # of the following doesn't
     # happen
@@ -96,12 +73,10 @@ def miillerTest(d, n):
     while (d != n - 1):
         x = (x * x) % n
         d *= 2
-
         if (x == 1):
             return False
         if (x == n - 1):
             return True
-
     # Return composite
     return False
 
@@ -112,24 +87,20 @@ def miillerTest(d, n):
 # accuracy level. Higher value of
 # k indicates more accuracy.
 def isPrime( n, k):
-
     # Corner cases
     if (n <= 1 or n == 4):
         return False
     if (n <= 3):
         return True
-
     # Find r such that n =
     # 2^d * r + 1 for some r >= 1
     d = n - 1
     while (d % 2 == 0):
         d //= 2
-
     # Iterate given nber of 'k' times
     for i in range(k):
         if (miillerTest(d, n) == False):
             return False
-
     return True
 
 def gcd(a, b):
@@ -162,7 +133,7 @@ def setup():
             d = y
             break
     N = p
-    e = exponentiation(2, d)
+    e = exponentiation_modulo(2, d)
     t1 = "{} {} {}".format(p, g, e)
     t2 = "{} {} {}".format(p, g, d)
     tx1 = "p:{}, g:{}, e:{}".format(p, g, e)
@@ -215,8 +186,8 @@ def encryption():
     # k = random.randint(0,p-1)
     for z in range(len(dbits.keys())):
         k = random.randint(1,10000)
-        C1 = exponentiation(g,k) % p
-        C2 = (exponentiation(e,k)*int(dbits[z],2)) % p
+        C1 = exponentiation_modulo(g,k) % p
+        C2 = (exponentiation_modulo(e,k)*int(dbits[z],2)) % p
         blocks[z] = [k, C1, C2]
     print("\nCiphertext, key + block pairs: (k, C1, C2):")
     print(blocks)
@@ -249,7 +220,7 @@ def decryption():
     for u in range(0, len(temp), 2):
         C1 = data.split(" ")[u]
         C2 = data.split(" ")[u+1]
-        c1 = exponentiation(int(C1),(int(p)-1-int(d))) % int(p)
+        c1 = exponentiation_modulo(int(C1),(int(p)-1-int(d))) % int(p)
         c2 = (int(C2) % int(p))
         m = (c1*c2) % int(p)
         ms.append(m)
@@ -288,8 +259,6 @@ def main():
             seed = input("Enter a random number: ")
         random.seed(int(seed))
         setup()
-        encryption()
-        decryption()
     elif int(i) == 2:
         read_keys()
         encryption()
