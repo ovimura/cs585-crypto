@@ -10,7 +10,8 @@ corresponding files. User can choose from three options what to do, 1 - to setup
 in ptext.txt file, and 3 - decrypt the ciphertext stored ctext.txt file.
 
 
-Run the following command to execute the program:
+Store the plaintext in the ptext.txt file then run the following command to execute the program:
+
     python3 public_key.py
 
     Choose 1, 2, or 3
