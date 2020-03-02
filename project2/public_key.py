@@ -54,7 +54,6 @@ def power(x, y, p):
         x = (x * x) % p
     return res
 
-
 def millerTest(d, n):
     """
      This function is called
