@@ -164,14 +164,14 @@ def read_keys():
     p = int(data[0])
     g = int(data[1])
     d = int(data[2])
-    print(p)
-    print(g)
-    print(d)
+    print("p: {}".format(p))
+    print("g: {}".format(g))
+    print("d: {}".format(d))
     with open(pub_key) as f:
         data = f.read()
     data = data.split(" ")
     e = int(data[2])
-    print(e)
+    print("e: {}".format(e))
     N = p
 
 def encryption():
@@ -214,7 +214,7 @@ def decryption():
     It decrypts the ciphertext from the ctext.txt file and stores the plaintext into the dtext.txt file.
     :return:
     """
-    global p, g, d, e
+    global p, g, d, e, N
     global plaintext_file, ciphertext_file, pri_key, pub_key
     print()
     with open(pri_key, "r") as f:
@@ -225,6 +225,7 @@ def decryption():
     with open(pub_key, "r") as f:
         data = f.read()
     e = data.split(" ")[2]
+    N = int(p)
     print("p: {}".format(p))
     print("g: {}".format(g))
     print("d: {}".format(d))
@@ -277,7 +278,6 @@ def main():
         read_keys()
         encryption()
     elif int(i) == 3:
-        read_keys()
         decryption()
 
 if __name__ == "__main__":

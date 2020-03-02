@@ -3,30 +3,32 @@ Assignment: Project 2
 Student: Ovidiu Mura
 Email: mura@pdx.edu
 
-2. A brief description of what you are submitting.
+This is the submission of Project 2. This is a program for public-key cryptosystem which encrypts and decrypts a file
+of any length. The cipher is based on modulo exponentiations all input and output files can contain integers.
+The program after gets an random integer from user generates the public key and the private key and store it in the
+corresponding files. User can choose from three options what to do, 1 - to setup, 2 - to encrypt the plaintext stored
+in ptext.txt file, and 3 - decrypt the ciphertext stored ctext.txt file.
 
-
-
-
-3. A precise description of how to build and use your program.
 
 Run the following command to execute the program:
     python3 public_key.py
 
     Choose 1, 2, or 3
-        1 - to run key generator
+        1 - to run key generator (enter a random integer - the seed)
         2 - to run encryption (assuming the key generator run before least once)
         3 - to run decryption (assuming the key generator and encryption run before least once)
 
 
 
+The files that are included:
 
-4. A list of files that should be in the archive, and a one-line description of each file.
-
-    ctext.txt   ciphertext file
-    dtext.txt   decrypted ciphertext from ctext.txt file
-    ptext.txt   the plaintext file
-    prikey.txt  the private key file
-    pubkey.txt  the public key file
-    public_key.py   the implementation of the public key file
-    README  an overview of the functionality and content of the project 2
+    ctext.txt               ciphertext file
+    dtext.txt               decrypted ciphertext from ctext.txt file
+    ptext.txt               the plaintext file
+    prikey.txt              the private key file
+    pubkey.txt              the public key file
+    public_key.py           the implementation of the public key cryptosystem
+    README                  an overview of the functionality and content of the Project 2
+    output_option_1.txt     the command line output of option 1
+    output_option_2.txt     the command line output of option 2
+    output_option_3.txt     the command line output of option 3
