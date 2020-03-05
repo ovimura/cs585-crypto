@@ -1,0 +1,13 @@
+
+Choose one of the following options: 
+     1. - key generation
+     2. - encryption
+     3. - decryption
+Enter your value: 1
+Welcome to Key Generation!
+
+Enter a random number:  345345345
+
+p: 4628583539, q: 2314291769
+p:4628583539, g:2, e:3055411089
+p:4628583539, g:2, d:1703768885

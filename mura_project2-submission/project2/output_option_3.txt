@@ -1,0 +1,13 @@
+
+Choose one of the following options: 
+     1. - key generation
+     2. - encryption
+     3. - decryption
+Enter your value: 3
+p: 4628583539
+g: 2
+d: 1703768885
+e: 3055411089
+
+Decrypted blocks: [1131575664, 1953458034, 1634756729, 543781664, 1952998688, 1634890784, 1868963959, 1919513705, 1852252271, 1914729327, 1819699566, 1730175855, 1684370222]
+Decrypted Ciphertext: Cryptography is the art of writing or solving codes.
