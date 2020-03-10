@@ -1,1 +1,1 @@
-Cryptography is the art of writing or solving codes.
+More generally, cryptography is about constructing and analyzing protocols that prevent third parties or the public from reading private
